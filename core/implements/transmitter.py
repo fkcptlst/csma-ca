@@ -23,22 +23,40 @@ class Transmitter(AbstractTransmitter):
         self.send_frames = frame_storage(send_queue_size)
         self.recv_frames = frame_storage(recv_queue_size)
         self.with_rts = with_rts
-        self.received = 0
-        self.received_current = 0
-        self.received_data = 0
-        self.sent = 0
+        self.recv = []
+        self.recv_current = 0
+        self.sent = []
         self.sent_current = 0
         self.collisions = 0
         self.last_sent = None
         self.detected = None
         self.csma = csma(slot_time)
 
+    def add_recv_record(self, frame: AbstractFrame):
+        i = 0
+        for record in self.recv:
+            if record["typ"] == frame.typ:
+                self.recv[i]["count"] += 1
+                self.recv[i]["size"] += frame.size
+                break
+            i += 1
+        self.recv.append({"typ": frame.typ, "count": 1, "size": frame.size})
+
+    def add_sent_record(self, frame: AbstractFrame):
+        i = 0
+        for record in self.sent:
+            if record["typ"] == frame.typ:
+                self.sent[i]["count"] += 1
+                self.sent[i]["size"] += frame.size
+                break
+            i += 1
+        self.sent.append({"typ": frame.typ, "count": 1, "size": frame.size})
+
     def on_receive_success(self):
         frame = self.recv_frames.pop()
-        self.received += frame.size
-        self.received_current = 0
+        self.add_recv_record(frame)
+        self.recv_current = 0
         if frame.typ == "DATA":
-            self.received_data += frame.size
             self.on_data(frame)
         elif frame.typ == "ACK":
             self.on_ack(frame)
@@ -50,7 +68,7 @@ class Transmitter(AbstractTransmitter):
 
     def on_receive_failure(self):
         self.recv_frames.pop()
-        self.received_current = 0
+        self.recv_current = 0
 
     def on_timeout(self):
         self.collisions += 1
@@ -89,9 +107,9 @@ class Transmitter(AbstractTransmitter):
 
         received = step * frame.size * self.frame_rate / ONE_SECOND
         if not frame.collision:
-            self.received_current += received
+            self.recv_current += received
 
-        if self.received_current > frame.size:
+        if self.recv_current > frame.size:
             if frame.collision:
                 self.on_receive_failure()
             else:
@@ -129,7 +147,7 @@ class Transmitter(AbstractTransmitter):
         frame.duplicate().depart()
 
         if self.sent_current > frame.size:
-            self.sent += frame.size
+            self.add_sent_record(frame)
             self.sent_current = 0
             self.send_frames.pop()
 

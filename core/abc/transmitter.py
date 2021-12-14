@@ -1,8 +1,13 @@
 from abc import ABC, abstractmethod
-from typing import Type, Union
+from typing import List, Type, TypedDict, Union
 
 from core.abc.csma import AbstractCSMA
-from core.abc.frame import AbstractFrame, AbstractFrameStorage
+from core.abc.frame import AbstractFrame, AbstractFrameStorage, FrameType
+
+
+ProceedRecord = TypedDict(
+    "ProceedRecord", {"typ": FrameType, "size": int, "count": int}
+)
 
 
 class AbstractTransmitter(ABC):
@@ -11,10 +16,9 @@ class AbstractTransmitter(ABC):
     send_frames: AbstractFrameStorage
     recv_frames: AbstractFrameStorage
 
-    received: int
-    received_current: int
-    received_data: int
-    sent: int
+    recv: List[ProceedRecord]
+    recv_current: int
+    sent: List[ProceedRecord]
     sent_current: int
     collisions: int
 
@@ -35,6 +39,14 @@ class AbstractTransmitter(ABC):
         frame_storage: Type[AbstractFrameStorage],
         csma: Type[AbstractCSMA],
     ):
+        pass
+
+    @abstractmethod
+    def add_recv_record(self, frame: AbstractFrame):
+        pass
+
+    @abstractmethod
+    def add_sent_record(self, frame: AbstractFrame):
         pass
 
     # receiver methods

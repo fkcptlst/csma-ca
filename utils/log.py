@@ -24,16 +24,16 @@ def frame_notate(frame: Frame):
 def logger_factory(medium: Medium, rts_cts: bool = True):
     def logger(timeline: TimeLine):
         processed = 0
-        processed_data = 0
         collisions = 0
         sent = 0
         frame_rate = 0
         count = 0
         for station in medium.stations:
-            processed += station.transmitter.received
-            processed_data += station.transmitter.received_data
+            processed += sum(
+                [r["size"] for r in station.transmitter.recv if r["typ"] == "DATA"]
+            )
             collisions += station.transmitter.collisions
-            sent += station.transmitter.sent // FRAME_SIZE
+            sent += sum([r["count"] for r in station.transmitter.sent])
             frame_rate += station.frame_rate
 
             count += 1
@@ -43,12 +43,8 @@ def logger_factory(medium: Medium, rts_cts: bool = True):
 
         bps_unit = KILLO
         bps = 8 * processed * ONE_SECOND / (timeline.current * bps_unit)
-        data_bps = 8 * processed_data * ONE_SECOND / (timeline.current * bps_unit)
         max_bps = 8 * processed_ideal * ONE_SECOND / (timeline.current * bps_unit)
         wasted_time = (processed_ideal - processed) / (frame_rate * FRAME_SIZE)
-        wasted_time_pure = (processed_ideal - processed_data) / (
-            frame_rate * FRAME_SIZE
-        )
         collision_rate = collisions / (sent if sent != 0 else 1)
 
         msg = f"{'[time]':20}{timeline.current/MILLI_SECOND:.2f}ms\n"
@@ -57,17 +53,12 @@ def logger_factory(medium: Medium, rts_cts: bool = True):
         msg += f"{'[throughput]':20}{bps:.2f} kbps\n"
         msg += f"{'[throughput rate]':20}{get_progress_bar(bps/max_bps)} {bps:.2f}/{max_bps:.2f} \n"
         msg += "\n"
-        if rts_cts:
-            msg += f"{'[wasted]':20}{wasted_time_pure/MILLI_SECOND:.2f}ms\n"
-            msg += f"{'[throughput]':20}{data_bps:.2f} kbps\n"
-            msg += f"{'[throughput rate]':20}{get_progress_bar(data_bps/max_bps)} {data_bps:.2f}/{max_bps:.2f} \n"
-        msg += "\n"
         msg += f"{'[collision rate]':20}{get_progress_bar(collision_rate)} {collisions}/{sent}\n"
         msg += f"{'[on air frames]':20} {medium.frame_count()}\n"
 
         msg += "\n"
         msg += f"[node details]\n"
-        msg += f"{'ID'.rjust(4)} | {'send-queue'.rjust(12)} | {'recv-queue'.rjust(12)} | {'col'.rjust(3)} | {'sending'.rjust(30)} | {'receiving'.rjust(30)} | {'detected'.rjust(12)} | {'backoff'.rjust(8)} | {'difs'.rjust(8)} | {'sifs'.rjust(8)} | {'timeout'.rjust(8)} | {'nav'.rjust(8)} | {'allocate'.rjust(8)} | "
+        msg += f"{'ID'.rjust(4)} | {'send'.rjust(8)} | {'recv'.rjust(8)} | {'c'.rjust(3)} | {'s'.rjust(3)} | {'r'.rjust(3)} | {'sending'.rjust(30)} | {'receiving'.rjust(30)} | {'detected'.rjust(12)} | {'backoff'.rjust(8)} | {'difs'.rjust(8)} | {'sifs'.rjust(8)} | {'timeout'.rjust(8)} | {'nav'.rjust(8)} | {'allocate'.rjust(8)} | "
 
         msg += "\n"
         for station in medium.stations:
@@ -75,20 +66,22 @@ def logger_factory(medium: Medium, rts_cts: bool = True):
 
             queue = ""
             for frame in station.transmitter.send_frames.all():
-                if len(queue) >= 12:
+                if len(queue) >= 8:
                     break
                 queue += f"{frame.icon()}"
-            msg += f"{queue.ljust(12, '░')} | "
+            msg += f"{queue.ljust(8, '░')} | "
 
             queue = ""
             for frame in station.transmitter.recv_frames.all():
-                if len(queue) >= 12:
+                if len(queue) >= 8:
                     break
                 queue += f"{frame.icon()}"
 
-            msg += f"{queue.ljust(12, '░')} | "
+            msg += f"{queue.ljust(8, '░')} | "
 
             msg += f"{station.transmitter.collisions:-3} | "
+            msg += f"{sum([r['count'] for r in station.transmitter.sent]):-3} | "
+            msg += f"{sum([r['count'] for r in station.transmitter.recv]):-3} | "
 
             sending = ""
             if station.transmitter.is_sending():
@@ -101,7 +94,7 @@ def logger_factory(medium: Medium, rts_cts: bool = True):
             receiving = ""
             if station.transmitter.is_receiving():
                 receiving = get_progress_bar(
-                    station.transmitter.received_current
+                    station.transmitter.recv_current
                     / station.transmitter.recv_frames.get().size
                 )
             msg += f"{receiving.ljust(30, ' ')} | "
