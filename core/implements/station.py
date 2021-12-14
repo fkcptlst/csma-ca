@@ -78,9 +78,6 @@ class Station(AbstractStation, TimeParticipant):
             and (self.timeline.current % self.slot_time == 0)
         )
 
-    def on_tick_init(self, step: int):
-        self.transmitter.detected = None
-
     def on_tick(self, step):
         if self.transmitter.last_sent is not None:
             if self.transmitter.last_sent.sent + self.timeout < self.timeline.current:

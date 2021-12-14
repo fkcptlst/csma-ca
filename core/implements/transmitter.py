@@ -21,6 +21,7 @@ class Transmitter(AbstractTransmitter):
         self.data_rate = data_rate
         self.send_frames = frame_storage(send_queue_size)
         self.recv_frames = frame_storage(recv_queue_size)
+        self.detected_frames = frame_storage()
         self.with_rts = with_rts
         self.recv = []
         self.recv_current = 0
@@ -28,7 +29,6 @@ class Transmitter(AbstractTransmitter):
         self.sent_current = 0
         self.collisions = 0
         self.last_sent = None
-        self.detected = None
         self.csma = csma(slot_time)
 
     def add_recv_record(self, frame: AbstractFrame):
@@ -74,12 +74,8 @@ class Transmitter(AbstractTransmitter):
         self.csma.collision_occured()
 
     def on_detect(self, frame: AbstractFrame):
-        self.detected = frame
-        receiving_frame = self.recv_frames.get()
-        if receiving_frame is not None:
-            if not frame.is_equal(receiving_frame):
-                receiving_frame.collide()
-        else:
+        self.detected_frames.push(frame)
+        if not self.talkover_detected():
             if frame.is_duplicate:
                 return
             elif frame.typ == "CTS":
@@ -89,8 +85,11 @@ class Transmitter(AbstractTransmitter):
             elif frame.receiver.id == self.station_id:
                 self.recv_frames.push(frame)
 
+    def talkover_detected(self) -> bool:
+        return self.detected_frames.count() > 1
+
     def is_medium_busy(self) -> bool:
-        if self.detected is not None:
+        if not self.detected_frames.is_empty():
             return True
         return False
 
@@ -100,18 +99,20 @@ class Transmitter(AbstractTransmitter):
     def proceed_recv(self, step: int):
         frame = self.recv_frames.get()
 
-        # frame stopped
-        if self.detected is None:
+        if self.detected_frames.is_empty():
+            # some data frame is lost, most likely due to collision
             self.on_receive_failure()
-
-        received = step * self.data_rate / ONE_SECOND
-        if not frame.collision:
+        elif self.talkover_detected():
+            # talkover (collision) occurs
+            return
+        elif self.detected_frames.get().id != frame.id:
+            # receiving frame ended, and detected frame is the one which made the collision
+            self.on_receive_failure()
+        else:
+            received = step * self.data_rate / ONE_SECOND
             self.recv_current += received
 
-        if self.recv_current >= frame.size:
-            if frame.collision:
-                self.on_receive_failure()
-            else:
+            if self.recv_current >= frame.size:
                 self.on_receive_success()
 
     def push(self, frame: AbstractFrame):

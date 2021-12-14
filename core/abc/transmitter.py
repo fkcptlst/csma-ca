@@ -15,6 +15,7 @@ class AbstractTransmitter(ABC):
     data_rate: int
     send_frames: AbstractFrameStorage
     recv_frames: AbstractFrameStorage
+    detected_frames: AbstractFrameStorage
 
     recv: List[ProceedRecord]
     recv_current: int
@@ -23,7 +24,6 @@ class AbstractTransmitter(ABC):
     collisions: int
 
     last_sent_data: Union[AbstractFrame, None]
-    detected: AbstractFrame
     csma: AbstractCSMA
     with_rts: bool
 
@@ -64,6 +64,10 @@ class AbstractTransmitter(ABC):
 
     @abstractmethod
     def on_detect(self, frame: AbstractFrame):
+        pass
+
+    @abstractmethod
+    def talkover_detected(self) -> bool:
         pass
 
     @abstractmethod

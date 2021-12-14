@@ -206,6 +206,9 @@ class FrameStorage(AbstractFrameStorage):
     def all(self) -> List[Frame]:
         return self.frames
 
+    def clear(self):
+        self.frames = []
+
     def get(self):
         try:
             return self.frames[0]

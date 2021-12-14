@@ -52,7 +52,10 @@ class Medium(AbstractMedium, TimeParticipant):
             return None
         return random.choice(stations)
 
-    def on_tick(self, step: int):
+    def on_tick_init(self, step: int):
+        for station in self.stations:
+            station.transmitter.detected_frames.clear()
+
         for frame in self.frames:
             if not frame.sent:
                 return
@@ -68,4 +71,5 @@ class Medium(AbstractMedium, TimeParticipant):
 
             if frame.moved_tail >= frame.max_range and not frame.vanished:
                 frame.vanish()
-                self.frames.remove(frame)
+
+        self.frames = [f for f in self.frames if not f.vanished]

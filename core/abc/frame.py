@@ -114,6 +114,10 @@ class AbstractFrameStorage(ABC):
         pass
 
     @abstractmethod
+    def clear(self) -> None:
+        pass
+
+    @abstractmethod
     def get(self) -> Union[AbstractFrame, None]:
         pass
 

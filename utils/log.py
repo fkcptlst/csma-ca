@@ -1,4 +1,4 @@
-from constant import FRAME_SIZE, KILLO, MILLI_SECOND, ONE_SECOND
+from constant import KILLO, MILLI_SECOND, ONE_SECOND
 from core.implements import Station, Medium, Frame
 from core.timeline import TimeLine
 from utils.helper import get_progress_bar
@@ -100,8 +100,10 @@ def logger_factory(medium: Medium, rts_cts: bool = True):
             msg += f"{receiving.ljust(30, ' ')} | "
 
             detected = ""
-            if station.transmitter.detected:
-                detected = str(station.transmitter.detected)
+            if station.transmitter.detected_frames.get():
+                if station.transmitter.detected_frames.count() > 1:
+                    detected += "* "
+                detected += str(station.transmitter.detected_frames.get())
             msg += f"{detected.rjust(12, ' ')} | "
 
             msg += f"{station.transmitter.csma.backoff.value:-8} | "
