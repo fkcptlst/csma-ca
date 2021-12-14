@@ -8,9 +8,10 @@ from core.abc.transmitter import AbstractTransmitter
 from core.abc.csma import AbstractCSMA
 from core.timeline import TimeParticipant
 from constant import (
-    FRAME_RATE,
+    ONE_SECOND,
+    STATION_DATA_RATE,
     STATION_DETECT_RANGE,
-    STATION_FRAME_PROBABILITY,
+    STATION_FRAME_RATE,
     SLOT_TIME,
     ACK_TIMEOUT,
 )
@@ -24,8 +25,8 @@ class Station(AbstractStation, TimeParticipant):
     detect_range: float = STATION_DETECT_RANGE
     slot_time: int = SLOT_TIME
     frame: Type[AbstractFrame]
-    frame_rate: int = FRAME_RATE
-    frame_probability: float = STATION_FRAME_PROBABILITY
+    data_rate: int = STATION_DATA_RATE
+    frame_rate: float = STATION_FRAME_RATE
     sent: int = 0
     timeout: int = ACK_TIMEOUT
     with_rts: bool = True
@@ -49,7 +50,7 @@ class Station(AbstractStation, TimeParticipant):
         self.transmitter = transmitter(
             station_id=self.id,
             slot_time=self.slot_time,
-            frame_rate=self.frame_rate,
+            data_rate=self.data_rate,
             send_queue_size=self.send_queue_size,
             recv_queue_size=self.recv_queue_size,
             with_rts=self.with_rts,
@@ -65,7 +66,7 @@ class Station(AbstractStation, TimeParticipant):
         if self.transmitter.csma.allocated.is_left():
             return False
 
-        return random.random() < self.frame_probability
+        return random.random() < (self.timeline.step * self.frame_rate / ONE_SECOND)
 
     def choose_receiver(self):
         return self.medium.get_random_receiver(self)

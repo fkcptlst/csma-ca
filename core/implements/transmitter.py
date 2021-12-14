@@ -1,7 +1,6 @@
 from typing import Type
 from constant import ONE_SECOND
 from core.abc.frame import AbstractFrame, AbstractFrameStorage
-from core.abc.station import AbstractStation
 from core.abc.transmitter import AbstractTransmitter
 from core.abc.csma import AbstractCSMA
 
@@ -11,7 +10,7 @@ class Transmitter(AbstractTransmitter):
         self,
         station_id: int,
         slot_time: int,
-        frame_rate: int,
+        data_rate: int,
         send_queue_size: int,
         recv_queue_size: int,
         with_rts: bool,
@@ -19,7 +18,7 @@ class Transmitter(AbstractTransmitter):
         csma: Type[AbstractCSMA],
     ):
         self.station_id = station_id
-        self.frame_rate = frame_rate
+        self.data_rate = data_rate
         self.send_frames = frame_storage(send_queue_size)
         self.recv_frames = frame_storage(recv_queue_size)
         self.with_rts = with_rts
@@ -105,11 +104,11 @@ class Transmitter(AbstractTransmitter):
         if self.detected is None:
             self.on_receive_failure()
 
-        received = step * frame.size * self.frame_rate / ONE_SECOND
+        received = step * self.data_rate / ONE_SECOND
         if not frame.collision:
             self.recv_current += received
 
-        if self.recv_current > frame.size:
+        if self.recv_current >= frame.size:
             if frame.collision:
                 self.on_receive_failure()
             else:
@@ -141,12 +140,12 @@ class Transmitter(AbstractTransmitter):
 
     def proceed_send(self, step: int):
         frame = self.send_frames.get()
-        sent = step * frame.size * self.frame_rate / ONE_SECOND
+        sent = step * self.data_rate / ONE_SECOND
 
         self.sent_current += sent
-        frame.duplicate().depart()
 
         if self.sent_current > frame.size:
+            frame.done()
             self.add_sent_record(frame)
             self.sent_current = 0
             self.send_frames.pop()

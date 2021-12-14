@@ -26,7 +26,7 @@ def logger_factory(medium: Medium, rts_cts: bool = True):
         processed = 0
         collisions = 0
         sent = 0
-        frame_rate = 0
+        data_rate = 0
         count = 0
         for station in medium.stations:
             processed += sum(
@@ -34,19 +34,17 @@ def logger_factory(medium: Medium, rts_cts: bool = True):
             )
             collisions += station.transmitter.collisions
             sent += sum([r["count"] for r in station.transmitter.sent])
-            frame_rate += station.frame_rate
+            data_rate += station.data_rate
 
             count += 1
 
-        frame_rate /= count
-        processed_ideal = frame_rate * FRAME_SIZE * timeline.current / ONE_SECOND
+        data_rate /= count
+        processed_ideal = data_rate * timeline.current / ONE_SECOND
 
         bps_unit = KILLO
         bps = 8 * processed * ONE_SECOND / (timeline.current * bps_unit)
         max_bps = 8 * processed_ideal * ONE_SECOND / (timeline.current * bps_unit)
-        wasted_time = (
-            (processed_ideal - processed) * ONE_SECOND / (frame_rate * FRAME_SIZE)
-        )
+        wasted_time = (processed_ideal - processed) * ONE_SECOND / (data_rate)
         collision_rate = collisions / (sent if sent != 0 else 1)
 
         msg = f"{'[time]':20}{timeline.current/MILLI_SECOND:.2f}ms\n"

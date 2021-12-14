@@ -4,10 +4,15 @@ from core.abc.frame import AbstractFrame, AbstractFrameStorage, FrameType
 from core.abc.station import AbstractStation
 
 from core.timeline import TimeLine, TimeParticipant
-from utils.helper import get_circle, get_distance
+from utils.helper import get_circle, get_distance, get_line
 from constant import (
     FRAME_SIZE,
 )
+
+
+class FramePath(TimeParticipant):
+    def __init__(self, location: Tuple[int, int]):
+        self.location = location
 
 
 class FrameRadius(TimeParticipant):
@@ -17,25 +22,37 @@ class FrameRadius(TimeParticipant):
 
 class DrawRadiusMixin:
     radius: List[FrameRadius] = []
+    paths: List[FramePath] = []
 
     def delete_radius(self):
         for radius in self.radius:
             radius.unregister()
+        for path in self.paths:
+            path.unregister()
         self.radius = []
+        self.paths = []
 
     def draw_radius(self):
-        radius = get_distance(self.location, self.sender.location)
-        points = get_circle(self.sender.location, radius)
-        for point in points:
-            path = FrameRadius(point)
+        radius = int(get_distance(self.location, self.sender.location))
+        radius_tail = int(get_distance(self.location_tail, self.sender.location))
+        for i in range(radius_tail, radius):
+            for point in get_circle(self.sender.location, i):
+                path = FrameRadius(point)
+                path.register()
+                self.radius.append(path)
+
+        paths = get_line(self.location_tail, self.location)
+        for point in paths:
+            path = FramePath(point)
             path.register()
-            self.radius.append(path)
+            self.paths.append(path)
 
 
 class Frame(AbstractFrame, DrawRadiusMixin, TimeParticipant):
     typ = "DATA"
     size = FRAME_SIZE
     sent = None
+    sent_done = None
     vanished = None
     collision = False
     is_duplicate = False
@@ -64,6 +81,9 @@ class Frame(AbstractFrame, DrawRadiusMixin, TimeParticipant):
         self.sender.medium.add_frame(self)
         self.sent = self.timeline.current
 
+    def done(self):
+        self.sent_done = self.timeline.current
+
     def vanish(self):
         self.vanished = self.timeline.current
         self.delete_radius()
@@ -72,17 +92,8 @@ class Frame(AbstractFrame, DrawRadiusMixin, TimeParticipant):
     def collide(self):
         self.collision = True
 
-    @property
-    def moved(self) -> float:
-        return min(
-            (self.timeline.current - self.sent) * self.propagation_speed,
-            self.max_range,
-        )
-
-    @property
-    def location(self) -> Tuple[int, int]:
+    def get_location(self, moved: float) -> Tuple[int, int]:
         distance = self.distance
-        moved = self.moved
         return (
             int(
                 self.sender.location[0]
@@ -97,6 +108,31 @@ class Frame(AbstractFrame, DrawRadiusMixin, TimeParticipant):
                 / distance
             ),
         )
+
+    @property
+    def moved_tail(self) -> float:
+        if self.sent_done is None:
+            return 0
+        return max(
+            (self.timeline.current - self.sent_done - self.timeline.step)
+            * self.propagation_speed,
+            0,
+        )
+
+    @property
+    def moved(self) -> float:
+        return min(
+            (self.timeline.current - self.sent) * self.propagation_speed,
+            self.max_range,
+        )
+
+    @property
+    def location_tail(self) -> Tuple[int, int]:
+        return self.get_location(self.moved_tail)
+
+    @property
+    def location(self) -> Tuple[int, int]:
+        return self.get_location(self.moved)
 
     @property
     def distance(self) -> float:

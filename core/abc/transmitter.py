@@ -12,7 +12,7 @@ ProceedRecord = TypedDict(
 
 class AbstractTransmitter(ABC):
     station_id: int
-    frame_rate: int
+    data_rate: int
     send_frames: AbstractFrameStorage
     recv_frames: AbstractFrameStorage
 
@@ -32,7 +32,7 @@ class AbstractTransmitter(ABC):
         self,
         station_id: int,
         slot_time: int,
-        frame_rate: int,
+        data_rate: int,
         send_queue_size: int,
         recv_queue_size: int,
         with_rts: bool,

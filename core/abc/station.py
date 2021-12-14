@@ -14,9 +14,9 @@ class AbstractStation(ABC):
     recv_queue_size: Optional[int]
     detect_range: float
     slot_time: int
+    data_rate: int
     frame: Type[AbstractFrame]
-    frame_rate: int
-    frame_probability: float
+    frame_rate: float
     last_sent: AbstractFrame
     sent: int
     timeout: int

@@ -20,6 +20,7 @@ class AbstractFrame(ABC):
     size: int
 
     sent: Optional[int]
+    sent_done: Optional[int]
     vanished: Optional[int]
 
     collision: bool
@@ -29,6 +30,10 @@ class AbstractFrame(ABC):
     # department and arrival
     @abstractmethod
     def depart(self):
+        pass
+
+    @abstractmethod
+    def done(self):
         pass
 
     @abstractmethod

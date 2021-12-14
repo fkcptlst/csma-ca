@@ -69,7 +69,6 @@ class TimeParticipant:
 
     def unregister(self):
         self.timeline.participants.remove(self)
-        self.timeline = None
 
     @property
     def current(self) -> int:

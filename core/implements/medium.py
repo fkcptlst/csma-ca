@@ -66,6 +66,6 @@ class Medium(AbstractMedium, TimeParticipant):
                         station.transmitter.on_detect(frame)
                         break
 
-            if frame.moved >= frame.max_range:
+            if frame.moved_tail >= frame.max_range and not frame.vanished:
                 frame.vanish()
                 self.frames.remove(frame)
