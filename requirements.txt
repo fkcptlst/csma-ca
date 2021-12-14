@@ -1,0 +1,15 @@
+antlr4-python3-runtime==4.8
+black==21.12b0
+click==8.0.3
+dependency-injector==4.37.0
+mypy==0.910
+mypy-extensions==0.4.3
+omegaconf==2.1.1
+pathspec==0.9.0
+platformdirs==2.4.0
+python-dotenv==0.19.2
+PyYAML==6.0
+six==1.16.0
+toml==0.10.2
+tomli==1.2.2
+typing_extensions==4.0.1

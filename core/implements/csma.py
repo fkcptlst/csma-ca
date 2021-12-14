@@ -5,8 +5,8 @@ from constant import (
     CTS_DURATION,
     RTS_DURATION,
     DIFS,
-    MINIMUM_BACKOFF,
-    MAXIMUM_BACKOFF,
+    BACKOFF_MAXIMUM,
+    BACKOFF_MINIMUM,
     SIFS,
 )
 from utils.counter import Counter
@@ -17,8 +17,8 @@ class CSMA(AbstractCSMA):
     cts_duration: int = CTS_DURATION
     sifs_amount: int = SIFS
     difs_amount: int = DIFS
-    backoff_max: int = MAXIMUM_BACKOFF
-    backoff_range: int = MINIMUM_BACKOFF
+    backoff_max: int = BACKOFF_MAXIMUM
+    backoff_range: int = BACKOFF_MINIMUM
     nav: Counter
     allocated: Counter
     sifs: Counter

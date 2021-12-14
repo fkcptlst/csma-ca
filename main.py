@@ -1,7 +1,14 @@
 from typing import Type
 
 from dependency_injector.wiring import Provide, inject
-from constant import AREA_SIZE, NODE_COUNT, NODE_DETECT_RANGE, STEP
+from constant import (
+    AREA_SIZE,
+    STATION_COUNT,
+    STATION_DETECT_RANGE,
+    STEP,
+    USE_RTS_CTS,
+    STAR_TOPOLOGY,
+)
 from core.implements import (
     Station,
     Medium,
@@ -18,8 +25,8 @@ from utils.log import logger_factory, station_notate, frame_notate
 
 @inject
 def main(timeline: TimeLine = Provide[TimeLineContainer.timeline]):
-    rts_cts = True
-    star_topology = True
+    rts_cts = USE_RTS_CTS
+    star_topology = STAR_TOPOLOGY
 
     station_type: Type[Station] = Station
     if rts_cts:
@@ -28,12 +35,12 @@ def main(timeline: TimeLine = Provide[TimeLineContainer.timeline]):
     medium = Medium(star_topology=star_topology)
     medium.register()
 
-    for i in range(0, NODE_COUNT):
+    for i in range(0, STATION_COUNT):
         center = star_topology and i == 0
 
         location = get_random_location(AREA_SIZE)
         if star_topology and not center:
-            location = get_random_location(AREA_SIZE, NODE_DETECT_RANGE - 1)
+            location = get_random_location(AREA_SIZE, STATION_DETECT_RANGE - 1)
         elif star_topology and center:
             location = (AREA_SIZE // 2, AREA_SIZE // 2)
 

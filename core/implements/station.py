@@ -9,8 +9,8 @@ from core.abc.csma import AbstractCSMA
 from core.timeline import TimeParticipant
 from constant import (
     FRAME_RATE,
-    NODE_DETECT_RANGE,
-    NODE_FRAME_PROBABILITY,
+    STATION_DETECT_RANGE,
+    STATION_FRAME_PROBABILITY,
     SLOT_TIME,
     ACK_TIMEOUT,
 )
@@ -21,11 +21,11 @@ from .medium import Medium
 class Station(AbstractStation, TimeParticipant):
     send_queue_size: int = 10
     recv_queue_size: int = 1
-    detect_range: float = NODE_DETECT_RANGE
+    detect_range: float = STATION_DETECT_RANGE
     slot_time: int = SLOT_TIME
     frame: Type[AbstractFrame]
     frame_rate: int = FRAME_RATE
-    frame_probability: float = NODE_FRAME_PROBABILITY
+    frame_probability: float = STATION_FRAME_PROBABILITY
     sent: int = 0
     timeout: int = ACK_TIMEOUT
     with_rts: bool = True
