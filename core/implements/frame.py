@@ -64,9 +64,6 @@ class Frame(AbstractFrame, DrawRadiusMixin, TimeParticipant):
         self.sender.medium.add_frame(self)
         self.sent = self.timeline.current
 
-    def arrive(self, station: AbstractStation):
-        station.transmitter.on_detect(self)
-
     def vanish(self):
         self.vanished = self.timeline.current
         self.delete_radius()

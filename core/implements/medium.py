@@ -34,7 +34,7 @@ class Medium(AbstractMedium, TimeParticipant):
         self.frames.remove(frame)
 
     def frame_count(self) -> int:
-        return len([f for f in self.frames if not f.is_duplicate])
+        return len(set([f.id for f in self.frames]))
 
     def get_random_receiver(self, sender: AbstractStation) -> AbstractStation:
         if self.star_topology:
@@ -63,7 +63,8 @@ class Medium(AbstractMedium, TimeParticipant):
 
                 for radius in frame.radius:
                     if is_location_equal(radius.location, station.location):
-                        frame.arrive(station)
+                        station.transmitter.on_detect(frame)
+                        break
 
             if frame.moved >= frame.max_range:
                 frame.vanish()

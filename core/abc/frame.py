@@ -32,10 +32,6 @@ class AbstractFrame(ABC):
         pass
 
     @abstractmethod
-    def arrive(self, station: "AbstractStation"):
-        pass
-
-    @abstractmethod
     def vanish(self):
         pass
 
