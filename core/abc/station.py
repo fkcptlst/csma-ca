@@ -31,5 +31,5 @@ class AbstractStation(ABC):
         pass
 
     @abstractmethod
-    def check_okay_to_send(self) -> bool:
+    def okay_to_send(self, step: int) -> bool:
         pass

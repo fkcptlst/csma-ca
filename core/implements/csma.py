@@ -18,6 +18,7 @@ class CSMA(AbstractCSMA):
     sifs_amount: int = SIFS
     difs_amount: int = DIFS
     backoff_max: int = BACKOFF_MAXIMUM
+    backoff_min: int = BACKOFF_MINIMUM
     backoff_range: int = BACKOFF_MINIMUM
     nav: Counter
     allocated: Counter
@@ -33,8 +34,10 @@ class CSMA(AbstractCSMA):
         self.difs = Counter()
 
     def collision_occured(self):
-        self.set_backoff()
         self.backoff_range = min(self.backoff_range * 2, self.backoff_max)
+
+    def reset_backoff_range(self):
+        self.backoff_range = self.backoff_min
 
     def set_backoff(self):
         self.backoff.reset(random.randint(0, self.backoff_range - 1))
@@ -56,33 +59,39 @@ class CSMA(AbstractCSMA):
             (not with_rts) and frame.typ == "DATA"
         )
 
-    def check(self, is_busy: bool, step: int):
+    def nav_decrease(self, step: int):
         # decrease allocated time
         if self.allocated.is_left():
             self.allocated.decrease(step)
 
-        # decrease nav time
+        # nav
         if self.nav.is_left():
             self.nav.decrease(step)
+
+    def check_and_decrease(self, is_busy: bool, step: int):
+        # should hibernate
+        if self.nav.is_left():
             return False
 
-        # backoff time
+        # wait for difs and sifs
+        if self.sifs.is_left():
+            self.sifs.decrease(step)
+            return False
+
+        if self.difs.is_left():
+            self.difs.decrease(step)
+            return False
+
+        # wait for backoff
         if self.backoff.is_left():
             if not is_busy:
                 self.backoff.decrease(step)
             return False
 
-        # detection time
-        if self.sifs.is_left():
-            self.sifs.decrease(step)
-            if is_busy:
-                self.set_sifs()
-            return False
-
-        if self.difs.is_left():
-            self.difs.decrease(step)
-            if is_busy:
-                self.set_difs()
+        # check the medium then set backoff
+        if is_busy:
+            self.set_difs()
+            self.set_backoff()
             return False
 
         return True

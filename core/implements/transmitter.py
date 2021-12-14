@@ -161,6 +161,7 @@ class Transmitter(AbstractTransmitter):
         self.last_sent = None
 
     def on_ack(self, frame: AbstractFrame):
+        self.csma.reset_backoff_range()
         self.csma.set_difs()
         self.last_sent = None
 
@@ -179,6 +180,7 @@ class Transmitter(AbstractTransmitter):
 
     def on_cts(self, frame: AbstractFrame):
         if frame.receiver.id == self.station_id:
+            self.csma.reset_backoff_range()
             self.csma.set_sifs()
             data_frame = frame.assemble(
                 receiver=frame.sender,
@@ -191,8 +193,11 @@ class Transmitter(AbstractTransmitter):
         else:
             self.csma.set_nav(frame.duration)
 
+    def is_acked(self) -> bool:
+        return self.last_sent is None
+
     def okay_to_send(self, step: int) -> bool:
         is_busy = self.is_medium_busy()
-        csma_okay = self.csma.check(is_busy, step)
-        acked = self.last_sent is None
-        return (not is_busy) and csma_okay and acked
+        csma_okay = self.csma.check_and_decrease(is_busy, step)
+        is_acked = self.is_acked()
+        return (not is_busy) and csma_okay and is_acked

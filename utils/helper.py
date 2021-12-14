@@ -33,7 +33,7 @@ def get_line(l1: Tuple[float, float], l2: Tuple[float, float]):
 
 
 # https://stackoverflow.com/questions/8487893/generate-all-the-points-on-the-circumference-of-a-circle
-def get_circle(center: Tuple[int, int], r: float):
+def get_circle(center: Tuple[float, float], r: float):
     pi = math.pi
     n = int(2 * r * pi)
     return [

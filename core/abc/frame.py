@@ -52,7 +52,16 @@ class AbstractFrame(ABC):
 
     @property
     @abstractmethod
-    def location(self) -> Tuple[int, int]:
+    def moved_tail(self) -> float:
+        pass
+
+    @property
+    @abstractmethod
+    def location(self) -> Tuple[float, float]:
+        pass
+
+    @property
+    def location_tail(self) -> Tuple[float, float]:
         pass
 
     @property

@@ -71,16 +71,12 @@ class Station(AbstractStation, TimeParticipant):
     def choose_receiver(self):
         return self.medium.get_random_receiver(self)
 
-    def check_okay_to_send(self) -> bool:
-        # access control check
-        if not self.transmitter.okay_to_send(self.timeline.step):
-            return False
-
-        # not in the same slot
-        if self.timeline.current % self.slot_time != 0:
-            return False
-
-        return True
+    def okay_to_send(self, step: int) -> bool:
+        return (
+            self.transmitter.okay_to_send(step)
+            and (not self.transmitter.send_frames.is_empty())
+            and (self.timeline.current % self.slot_time == 0)
+        )
 
     def on_tick_init(self, step: int):
         self.transmitter.detected = None
@@ -90,6 +86,8 @@ class Station(AbstractStation, TimeParticipant):
             if self.transmitter.last_sent.sent + self.timeout < self.timeline.current:
                 self.transmitter.last_sent = None
                 self.transmitter.on_timeout()
+
+        self.transmitter.csma.nav_decrease(step)
 
         if self.transmitter.is_sending():
             self.transmitter.proceed_send(step)
@@ -117,6 +115,5 @@ class Station(AbstractStation, TimeParticipant):
                     )
                 )
 
-        if self.check_okay_to_send():
-            if not self.transmitter.send_frames.is_empty():
-                self.transmitter.send(step)
+        if self.okay_to_send(step):
+            self.transmitter.send(step)

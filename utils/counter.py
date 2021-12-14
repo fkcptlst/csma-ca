@@ -9,7 +9,7 @@ class Counter:
         self.value += step
 
     def decrease(self, step=1):
-        self.value -= step
+        self.value = max(self.value - step, 0)
 
     def reset(self, value=0):
         self.value = int(self.slot * value)

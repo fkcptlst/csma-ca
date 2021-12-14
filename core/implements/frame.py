@@ -11,12 +11,12 @@ from constant import (
 
 
 class FramePath(TimeParticipant):
-    def __init__(self, location: Tuple[int, int]):
+    def __init__(self, location: Tuple[float, float]):
         self.location = location
 
 
 class FrameRadius(TimeParticipant):
-    def __init__(self, location: Tuple[int, int]):
+    def __init__(self, location: Tuple[float, float]):
         self.location = location
 
 
@@ -92,16 +92,16 @@ class Frame(AbstractFrame, DrawRadiusMixin, TimeParticipant):
     def collide(self):
         self.collision = True
 
-    def get_location(self, moved: float) -> Tuple[int, int]:
+    def get_location(self, moved: float) -> Tuple[float, float]:
         distance = self.distance
         return (
-            int(
+            (
                 self.sender.location[0]
                 + (self.receiver.location[0] - self.sender.location[0])
                 * moved
                 / distance
             ),
-            int(
+            (
                 self.sender.location[1]
                 + (self.receiver.location[1] - self.sender.location[1])
                 * moved
@@ -127,11 +127,11 @@ class Frame(AbstractFrame, DrawRadiusMixin, TimeParticipant):
         )
 
     @property
-    def location_tail(self) -> Tuple[int, int]:
+    def location_tail(self) -> Tuple[float, float]:
         return self.get_location(self.moved_tail)
 
     @property
-    def location(self) -> Tuple[int, int]:
+    def location(self) -> Tuple[float, float]:
         return self.get_location(self.moved)
 
     @property

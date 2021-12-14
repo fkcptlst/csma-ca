@@ -9,6 +9,7 @@ class AbstractCSMA(ABC):
     sifs_amount: int
     difs_amount: int
     backoff_max: int
+    backoff_min: int
     backoff_range: int
     nav: Counter
     allocated: Counter
@@ -22,6 +23,10 @@ class AbstractCSMA(ABC):
 
     @abstractmethod
     def collision_occured(self):
+        pass
+
+    @abstractmethod
+    def reset_backoff_range(self):
         pass
 
     @abstractmethod
@@ -49,5 +54,9 @@ class AbstractCSMA(ABC):
         pass
 
     @abstractmethod
-    def check(self, is_busy: bool, step: int):
+    def nav_decrease(self, step: int):
+        pass
+
+    @abstractmethod
+    def check_and_decrease(self, is_busy: bool, step: int):
         pass
