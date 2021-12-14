@@ -44,7 +44,9 @@ def logger_factory(medium: Medium, rts_cts: bool = True):
         bps_unit = KILLO
         bps = 8 * processed * ONE_SECOND / (timeline.current * bps_unit)
         max_bps = 8 * processed_ideal * ONE_SECOND / (timeline.current * bps_unit)
-        wasted_time = (processed_ideal - processed) / (frame_rate * FRAME_SIZE)
+        wasted_time = (
+            (processed_ideal - processed) * ONE_SECOND / (frame_rate * FRAME_SIZE)
+        )
         collision_rate = collisions / (sent if sent != 0 else 1)
 
         msg = f"{'[time]':20}{timeline.current/MILLI_SECOND:.2f}ms\n"
