@@ -18,7 +18,7 @@ from core.implements import (
     FrameStorage,
     CSMA,
 )
-from core.implements.frame import FramePath
+from core.implements.frame import FramePath, FrameRadiusEdge
 from core.timeline import TimeLine, TimeLineContainer
 from utils.helper import get_random_location
 from utils.log import logger_factory, station_notate, frame_notate
@@ -72,6 +72,7 @@ if __name__ == "__main__":
                 {"instance": Station, "notation": station_notate},
                 {"instance": Frame, "notation": frame_notate},
                 {"instance": FramePath, "notation": "* "},
+                {"instance": FrameRadiusEdge, "notation": "+ "},
                 {"instance": FrameRadius, "notation": "- "},
                 {"instance": "default", "notation": "  "},
             ],

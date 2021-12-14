@@ -20,6 +20,11 @@ class FrameRadius(TimeParticipant):
         self.location = location
 
 
+class FrameRadiusEdge(TimeParticipant):
+    def __init__(self, location: Tuple[float, float]):
+        self.location = location
+
+
 class DrawRadiusMixin:
     radius: List[FrameRadius] = []
     paths: List[FramePath] = []
@@ -37,7 +42,9 @@ class DrawRadiusMixin:
         radius_tail = int(get_distance(self.location_tail, self.sender.location))
         for i in range(radius_tail, radius):
             for point in get_circle(self.sender.location, i):
-                path = FrameRadius(point)
+                path = (
+                    FrameRadius(point) if i != (radius - 1) else FrameRadiusEdge(point)
+                )
                 path.register()
                 self.radius.append(path)
 
