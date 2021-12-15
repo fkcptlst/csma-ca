@@ -118,44 +118,56 @@ default_settings = {
 ### Minimum Backoff
 
 bps
+
 <img src="assets/backoff_bps.png" />
 
 wasted
+
 <img src="assets/backoff_wasted.png" />
 
 ### Frame Rate
 
 bps
+
 <img src="assets/frame_rate_bps.png" />
 
 wasted
+
 <img src="assets/frame_rate_wasted.png" />
 
 ### Station Count
 
 bps
+
 <img src="assets/station_count_bps.png" />
 
 wasted
+
 <img src="assets/station_count_wasted.png" />
 
 ### Station Count & Minimum Backoff
 
 bps
+
 <img src="assets/station_count_backoff_bps.png" />
 wasted
+
 <img src="assets/station_count_backoff_wasted.png" />
 
 ### Station Count & Frame Rate
 
 bps
+
 <img src="assets/station_count_frame_rate_bps.png" />
 wasted
+
 <img src="assets/station_count_frame_rate_wasted.png" />
 
 ### Frame Rate & Minimum Backoff
 
 bps
+
 <img src="assets/frame_rate_backoff_bps.png" />
 wasted
+
 <img src="assets/frame_rate_backoff_wasted.png" />
