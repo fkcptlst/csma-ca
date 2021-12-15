@@ -9,7 +9,7 @@ default_settings = {
     "with_rts": True,
     "propagation_speed": SPEED_OF_LIGHT / 3,
     "area_size": 80,
-    "station_count": 5,
+    "station_count": 10,
     "data_rate": 11 * MEGA,
     "frame_rate": 300,
     "detect_range": 40,
@@ -61,6 +61,12 @@ sim_settings = {
 }
 
 various_settings = []
-various_settings += [{**sim_settings, **s} for s in station_count]
-various_settings += [{**sim_settings, **f} for f in frame_rate]
-various_settings += [{**sim_settings, **b} for b in backoff_min]
+# various_settings += [{**sim_settings, **s} for s in station_count]
+# various_settings += [{**sim_settings, **f} for f in frame_rate]
+# various_settings += [{**sim_settings, **b} for b in backoff_min]
+various_settings += [
+    {**sim_settings, **s, **f, **b}
+    for s in station_count
+    for f in frame_rate
+    for b in backoff_min
+]
