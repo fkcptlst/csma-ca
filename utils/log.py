@@ -21,35 +21,44 @@ def frame_notate(frame: Frame):
         return frame.icon()
 
 
-def logger_factory(medium: Medium, rts_cts: bool = True):
+def logger_factory(medium: Medium, frame_size: int):
     def logger(timeline: TimeLine):
         processed = 0
         collisions = 0
         sent = 0
         data_rate = 0
+        frame_rate = 0
         count = 0
+        wasted = 0
         for station in medium.stations:
             processed += sum(
                 [r["size"] for r in station.transmitter.recv if r["typ"] == "DATA"]
             )
             collisions += station.transmitter.collisions
+            wasted += station.transmitter.wasted
             sent += sum([r["count"] for r in station.transmitter.sent])
             data_rate += station.data_rate
+            frame_rate += station.frame_rate
 
             count += 1
 
         data_rate /= count
-        processed_ideal = data_rate * timeline.current / ONE_SECOND
+        frame_rate /= count
+        processed_ideal = (
+            frame_size
+            * (frame_rate / ONE_SECOND)
+            * (data_rate / ONE_SECOND)
+            * timeline.current
+        )
 
         bps_unit = KILLO
         bps = 8 * processed * ONE_SECOND / (timeline.current * bps_unit)
         max_bps = 8 * processed_ideal * ONE_SECOND / (timeline.current * bps_unit)
-        wasted_time = (processed_ideal - processed) * ONE_SECOND / (data_rate)
         collision_rate = collisions / (sent if sent != 0 else 1)
 
         msg = f"{'[time]':20}{timeline.current/MILLI_SECOND:.2f}ms\n"
         msg += "\n"
-        msg += f"{'[wasted]':20}{wasted_time/MILLI_SECOND:.2f}ms\n"
+        msg += f"{'[wasted]':20}{wasted/MILLI_SECOND:.2f}ms\n"
         msg += f"{'[throughput]':20}{bps:.2f} kbps\n"
         msg += f"{'[throughput rate]':20}{get_progress_bar(bps/max_bps)} {bps:.2f}/{max_bps:.2f} \n"
         msg += "\n"

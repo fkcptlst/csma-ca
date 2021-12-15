@@ -28,6 +28,7 @@ class Transmitter(AbstractTransmitter):
         self.sent_current = 0
         self.collisions = 0
         self.last_sent = None
+        self.wasted = 0
         self.csma = csma(data_rate=self.data_rate)
         self.timeout = self.csma.sifs_amount + 2 * self.csma.frame_time
 
@@ -104,7 +105,7 @@ class Transmitter(AbstractTransmitter):
             self.on_receive_failure()
         elif self.talkover_detected():
             # talkover (collision) occurs
-            return
+            self.wasted += step
         elif self.detected_frames.get().id != frame.id:
             # receiving frame ended, and detected frame is the one which made the collision
             self.on_receive_failure()

@@ -25,6 +25,7 @@ class AbstractTransmitter(ABC):
 
     last_sent_data: Union[AbstractFrame, None]
     csma: AbstractCSMA
+    wasted: int
     with_rts: bool
 
     @abstractmethod
