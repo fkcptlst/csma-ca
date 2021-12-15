@@ -1,12 +1,12 @@
 import random
 from typing import List, Tuple, Optional
+
+from dependency_injector.wiring import Provide
 from core.abc.frame import AbstractFrame, AbstractFrameStorage, FrameType
 from core.abc.station import AbstractStation
-from core.timeline import TimeParticipant
+from core.container import DIContainer
+from core.time.participant import TimeParticipant
 from utils.helper import get_circle, get_distance, get_line
-from constant import (
-    FRAME_SIZE,
-)
 
 
 class FramePath(TimeParticipant):
@@ -56,7 +56,6 @@ class DrawRadiusMixin:
 
 class Frame(AbstractFrame, DrawRadiusMixin, TimeParticipant):
     typ = "DATA"
-    size = FRAME_SIZE
     sent = None
     sent_done = None
     vanished = None
@@ -69,12 +68,14 @@ class Frame(AbstractFrame, DrawRadiusMixin, TimeParticipant):
         sender: AbstractStation,
         receiver: AbstractStation,
         typ: FrameType,
+        size: int = Provide[DIContainer.settings.frame_size],
         duration: Optional[int] = None,
     ):
         self.id = id
         self.sender = sender
         self.receiver = receiver
         self.typ = typ
+        self.size = size
         self.duration = duration
         self.propagation_speed = sender.medium.propagation_speed
         self.max_range = sender.detect_range

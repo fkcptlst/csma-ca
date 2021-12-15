@@ -4,17 +4,16 @@ from typing import Callable, Dict, List, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from .participant import TimeParticipant
 
-from constant import AREA_SIZE, MAX_TIME, INTERVAL, STEP
 from utils.area import AreaDrawer
 
 
 class TimeLine:
     def __init__(
         self,
-        interval: float = INTERVAL,
-        step: int = STEP,
-        max_time: int = MAX_TIME,
-        area_size: int = AREA_SIZE,
+        interval: float,
+        step: int,
+        max_time: int,
+        area_size: int,
         notation: List[Dict] = [],
         log_screen: bool = True,
     ):

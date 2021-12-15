@@ -7,7 +7,7 @@ from core.abc.station import AbstractStation
 from core.abc.frame import AbstractFrame
 from core.container import DIContainer
 
-from core.timeline import TimeParticipant
+from core.time.participant import TimeParticipant
 from utils.helper import get_distance, get_random_location, is_location_equal
 
 
@@ -34,7 +34,6 @@ class Medium(AbstractMedium, TimeParticipant):
         frame_rate: float,
         detect_range: float,
         slot_time: int,
-        timeout: int,
         with_rts: bool,
         station_type: Type[AbstractStation] = Provide[DIContainer.station],
     ):
@@ -55,7 +54,6 @@ class Medium(AbstractMedium, TimeParticipant):
                 frame_rate=frame_rate,
                 detect_range=detect_range,
                 slot_time=slot_time,
-                timeout=timeout,
                 with_rts=with_rts,
             )
 

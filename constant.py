@@ -1,25 +1,3 @@
-import os
-from dotenv import load_dotenv
-
-load_dotenv("config.env")
-
-INTERVAL = float(os.getenv("TIMELINE_INTERVAL", 0.05))  # seconds
-STEP = int(os.getenv("TIMELINE_STEP", 10))
-AREA_SIZE = int(os.getenv("AREA_SIZE", 50))
-
-FRAME_SIZE = 8 * int(os.getenv("FRAME_SIZE", 1500))  # bits
-
-STATION_COUNT = int(os.getenv("STATION_COUNT", 10))
-STATION_FRAME_RATE = int(os.getenv("STATION_FRAME_RATE", 500))  # Frames/s
-STATION_DETECT_RANGE = int(os.getenv("STATION_DETECT_RANGE", 25))
-STATION_DATA_RATE = int(os.getenv("STATION_DATA_RATE", 11000000))  # bps
-
-BACKOFF_MINIMUM = int(os.getenv("BACKOFF_MINIMUM", 4))
-BACKOFF_MAXIMUM = int(os.getenv("BACKOFF_MAXIMUM", 1024))
-
-STAR_TOPOLOGY = bool(os.getenv("STAR_TOPOLOGY", False) == "True")
-USE_RTS_CTS = bool(os.getenv("USE_RTS_CTS", False) == "True")
-
 ONE_SECOND = 1000000  # micro seconds
 MILLI_SECOND = 1000
 MAX_TIME = ONE_SECOND
@@ -29,18 +7,5 @@ MEGA = 1000000
 KILLO_METER = 100
 
 SPEED_OF_LIGHT = 0.3 * KILLO_METER
-PROPAGATION_SPEED = SPEED_OF_LIGHT / 3
-
-# SLOT_TIME must be divisible by STEP
-SLOT_TIME = 20
 
 SIFS = 10
-DIFS = SIFS + 2 * SLOT_TIME
-
-
-FRAME_TIME = int(FRAME_SIZE / (STATION_DATA_RATE / ONE_SECOND) + 2 * SLOT_TIME)
-RTS_DURATION = SIFS + FRAME_TIME + SIFS + FRAME_TIME + SIFS + FRAME_TIME
-CTS_DURATION = SIFS + FRAME_TIME + SIFS + FRAME_TIME
-
-ACK_TIMEOUT = SIFS + 2 * FRAME_TIME
-CTS_TIMEOUT = SIFS + 2 * FRAME_TIME

@@ -8,8 +8,8 @@ from core.abc.station import AbstractStation
 from core.abc.transmitter import AbstractTransmitter
 from core.abc.csma import AbstractCSMA
 from core.abc.medium import AbstractMedium
+from core.time.participant import TimeParticipant
 from core.container import DIContainer
-from core.timeline import TimeParticipant
 from constant import (
     ONE_SECOND,
 )
@@ -32,7 +32,6 @@ class Station(AbstractStation, TimeParticipant):
         frame_rate: int,
         detect_range: float,
         slot_time: int,
-        timeout: int,
         with_rts: bool,
         transmitter: Type[AbstractTransmitter] = Provide[DIContainer.transmitter],
         frame: Type[AbstractFrame] = Provide[DIContainer.frame],
@@ -47,12 +46,10 @@ class Station(AbstractStation, TimeParticipant):
         self.frame_rate = frame_rate
         self.detect_range = detect_range
         self.slot_time = slot_time
-        self.timeout = timeout
 
         self.frame = frame
         self.transmitter = transmitter(
             station_id=self.id,
-            slot_time=self.slot_time,
             data_rate=self.data_rate,
             send_queue_size=self.send_queue_size,
             recv_queue_size=self.recv_queue_size,
@@ -83,10 +80,7 @@ class Station(AbstractStation, TimeParticipant):
         )
 
     def on_tick(self, step):
-        if self.transmitter.last_sent is not None:
-            if self.transmitter.last_sent.sent + self.timeout < self.timeline.current:
-                self.transmitter.last_sent = None
-                self.transmitter.on_timeout()
+        self.transmitter.check_timeout(self.timeline.current)
 
         self.transmitter.csma.nav_decrease(step)
 

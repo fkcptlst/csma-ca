@@ -1,18 +1,10 @@
-from typing import Type
+from typing import Type, Dict
 
 from dependency_injector.wiring import Provide, inject
 from constant import (
-    ACK_TIMEOUT,
-    AREA_SIZE,
-    PROPAGATION_SPEED,
-    SLOT_TIME,
-    STAR_TOPOLOGY,
-    STATION_COUNT,
-    STATION_DATA_RATE,
-    STATION_FRAME_RATE,
-    STEP,
-    USE_RTS_CTS,
-    STATION_DETECT_RANGE,
+    MEGA,
+    ONE_SECOND,
+    SPEED_OF_LIGHT,
 )
 from core.implements import (
     Station,
@@ -25,31 +17,31 @@ from core.implements import (
     FrameRadiusEdge,
     CSMA,
 )
-from core.timeline import TimeLine
+from core.time.line import TimeLine
 from core.container import DIContainer
 from utils.log import logger_factory, station_notate, frame_notate
 
 
 @inject
 def main(
+    settings: Dict = Provide[DIContainer.config.settings],
     timeline: TimeLine = Provide[DIContainer.timeline],
     medium: Type[Medium] = Provide[DIContainer.medium],
 ):
     medium = medium(
-        star_topology=STAR_TOPOLOGY,
-        propagation_speed=PROPAGATION_SPEED,
-        station_count=STATION_COUNT,
-        area_size=AREA_SIZE,
+        star_topology=settings["star_topology"],
+        propagation_speed=settings["propagation_speed"],
+        station_count=settings["station_count"],
+        area_size=settings["area_size"],
     )
     medium.init_stations(
-        data_rate=STATION_DATA_RATE,
-        frame_rate=STATION_FRAME_RATE,
-        detect_range=STATION_DETECT_RANGE,
-        slot_time=SLOT_TIME,
-        timeout=ACK_TIMEOUT,
-        with_rts=USE_RTS_CTS,
+        data_rate=settings["data_rate"],
+        frame_rate=settings["frame_rate"],
+        detect_range=settings["detect_range"],
+        slot_time=settings["slot_time"],
+        with_rts=settings["with_rts"],
     )
-    timeline.set_after_tick(logger_factory(medium, USE_RTS_CTS))
+    timeline.set_after_tick(logger_factory(medium, settings["with_rts"]))
     timeline.run()
 
 
@@ -57,18 +49,34 @@ if __name__ == "__main__":
     di_container = DIContainer()
     di_container.config.from_dict(
         {
-            "timeline": {
-                "notation": [
-                    {"instance": Station, "notation": station_notate},
-                    {"instance": Frame, "notation": frame_notate},
-                    {"instance": FramePath, "notation": "* "},
-                    {"instance": FrameRadiusEdge, "notation": "+ "},
-                    {"instance": FrameRadius, "notation": "- "},
-                    {"instance": "default", "notation": "  "},
-                ],
+            "settings": {
+                "star_topology": True,
+                "with_rts": True,
+                "propagation_speed": SPEED_OF_LIGHT / 3,
+                "area_size": 50,
+                "station_count": 5,
+                "data_rate": 11 * MEGA,
+                "frame_rate": 100,
+                "detect_range": 25,
+                "frame_size": 1500,
+                "backoff_min": 2,
+                "backoff_max": 1024,
+                "interval": 0.05,
+                "slot_time": 20,
+                "step": 20,
+                "max_time": 1 * ONE_SECOND,
+                "area_size": 50,
                 "log_screen": True,
-                "step": STEP,
+                "sifs": 10,
             },
+            "notation": [
+                {"instance": Station, "notation": station_notate},
+                {"instance": Frame, "notation": frame_notate},
+                {"instance": FramePath, "notation": "* "},
+                {"instance": FrameRadiusEdge, "notation": "+ "},
+                {"instance": FrameRadius, "notation": "- "},
+                {"instance": "default", "notation": "  "},
+            ],
             "medium": Medium,
             "station": Station,
             "frame": Frame,

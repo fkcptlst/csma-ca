@@ -1,6 +1,6 @@
 from constant import KILLO, MILLI_SECOND, ONE_SECOND
 from core.implements import Station, Medium, Frame
-from core.timeline import TimeLine
+from core.time.line import TimeLine
 from utils.helper import get_progress_bar
 
 
@@ -113,7 +113,7 @@ def logger_factory(medium: Medium, rts_cts: bool = True):
             timeout = ""
             if station.transmitter.last_sent:
                 timeout = str(
-                    station.timeout
+                    station.transmitter.timeout
                     - (timeline.current - station.transmitter.last_sent.sent)
                 )
             msg += f"{timeout.rjust(8)} | "

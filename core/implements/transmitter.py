@@ -9,7 +9,6 @@ class Transmitter(AbstractTransmitter):
     def __init__(
         self,
         station_id: int,
-        slot_time: int,
         data_rate: int,
         send_queue_size: int,
         recv_queue_size: int,
@@ -29,7 +28,8 @@ class Transmitter(AbstractTransmitter):
         self.sent_current = 0
         self.collisions = 0
         self.last_sent = None
-        self.csma = csma(slot_time)
+        self.csma = csma(data_rate=self.data_rate)
+        self.timeout = self.csma.sifs_amount + 2 * self.csma.frame_time
 
     def add_recv_record(self, frame: AbstractFrame):
         i = 0
@@ -202,3 +202,11 @@ class Transmitter(AbstractTransmitter):
         csma_okay = self.csma.check_and_decrease(is_busy, step)
         is_acked = self.is_acked()
         return (not is_busy) and csma_okay and is_acked
+
+    def check_timeout(self, current: int):
+        if self.last_sent is None:
+            return
+
+        if self.last_sent.sent + self.timeout < current:
+            self.last_sent = None
+            self.on_timeout()

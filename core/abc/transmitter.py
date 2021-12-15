@@ -31,7 +31,6 @@ class AbstractTransmitter(ABC):
     def __init__(
         self,
         station_id: int,
-        slot_time: int,
         data_rate: int,
         send_queue_size: int,
         recv_queue_size: int,
@@ -123,4 +122,8 @@ class AbstractTransmitter(ABC):
     # access control
     @abstractmethod
     def okay_to_send(self, step: int) -> bool:
+        pass
+
+    @abstractmethod
+    def check_timeout(self, current: int):
         pass

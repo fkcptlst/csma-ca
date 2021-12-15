@@ -11,6 +11,7 @@ class AbstractCSMA(ABC):
     backoff_max: int
     backoff_min: int
     backoff_range: int
+    frame_time: int
     nav: Counter
     allocated: Counter
     sifs: Counter
@@ -18,7 +19,7 @@ class AbstractCSMA(ABC):
     backoff: Counter
 
     @abstractmethod
-    def __init__(self, slot_time: int):
+    def __init__(self, slot_time: int, backoff_min: int, backoff_max: int):
         pass
 
     @abstractmethod

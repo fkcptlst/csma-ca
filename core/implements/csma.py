@@ -1,32 +1,33 @@
 import random
+from dependency_injector.wiring import Provide
 from core.abc.csma import AbstractCSMA
 from core.abc.frame import AbstractFrame
+from core.container import DIContainer
 from constant import (
-    CTS_DURATION,
-    RTS_DURATION,
-    DIFS,
-    BACKOFF_MAXIMUM,
-    BACKOFF_MINIMUM,
-    SIFS,
+    ONE_SECOND,
 )
 from utils.counter import Counter
 
 
 class CSMA(AbstractCSMA):
-    rts_duration: int = RTS_DURATION
-    cts_duration: int = CTS_DURATION
-    sifs_amount: int = SIFS
-    difs_amount: int = DIFS
-    backoff_max: int = BACKOFF_MAXIMUM
-    backoff_min: int = BACKOFF_MINIMUM
-    backoff_range: int = BACKOFF_MINIMUM
-    nav: Counter
-    allocated: Counter
-    sifs: Counter
-    difs: Counter
-    backoff: Counter
+    def __init__(
+        self,
+        data_rate: int,
+        frame_size: int = Provide[DIContainer.settings.frame_size],
+        slot_time: int = Provide[DIContainer.settings.slot_time],
+        sifs_amount: int = Provide[DIContainer.settings.sifs],
+        backoff_min: int = Provide[DIContainer.settings.backoff_min],
+        backoff_max: int = Provide[DIContainer.settings.backoff_max],
+    ):
+        self.sifs_amount = sifs_amount
+        self.difs_amount = sifs_amount + 2 * slot_time
 
-    def __init__(self, slot_time: int):
+        self.frame_time = int(frame_size / (data_rate * ONE_SECOND)) + 2 * slot_time
+        self.rts_duration = 2 * sifs_amount + 2 * self.frame_time
+        self.cts_duration = 3 * sifs_amount + 3 * self.frame_time
+        self.backoff_min = backoff_min
+        self.backoff_max = backoff_max
+        self.backoff_range = backoff_min
         self.backoff = Counter(slot_time)
         self.nav = Counter()
         self.allocated = Counter()
