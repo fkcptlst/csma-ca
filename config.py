@@ -20,7 +20,6 @@ default_settings = {
     "slot_time": 20,
     "step": 10,
     "max_time": ONE_SECOND,
-    "area_size": 50,
     "log": True,
     "log_screen": True,
     "sifs": 10,
