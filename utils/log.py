@@ -50,16 +50,11 @@ def parse_result(timeline: TimeLine, settings: Dict):
 
     data_rate /= count
     frame_rate /= count
-    processed_ideal = (
-        frame_size
-        * (frame_rate / ONE_SECOND)
-        * (data_rate / ONE_SECOND)
-        * timeline.current
-    )
+    processed_ideal = (data_rate / ONE_SECOND) * timeline.current
 
     bps_unit = KILLO
-    bps = 8 * processed * ONE_SECOND / (timeline.current * bps_unit)
-    max_bps = 8 * processed_ideal * ONE_SECOND / (timeline.current * bps_unit)
+    bps = processed * ONE_SECOND / (timeline.current * bps_unit)
+    max_bps = processed_ideal * ONE_SECOND / (timeline.current * bps_unit)
     collision_rate = collisions / (sent if sent != 0 else 1)
 
     return (

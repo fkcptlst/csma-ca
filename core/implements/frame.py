@@ -2,6 +2,7 @@ import random
 from typing import List, Tuple, Optional
 
 from dependency_injector.wiring import Provide
+from constant import ACK_FRAME_SIZE, CTS_FRAME_SIZE, RTS_FRAME_SIZE
 from core.abc.frame import AbstractFrame, AbstractFrameStorage, FrameType
 from core.abc.station import AbstractStation
 from core.container import DIContainer
@@ -75,7 +76,15 @@ class Frame(AbstractFrame, DrawRadiusMixin, TimeParticipant):
         self.sender = sender
         self.receiver = receiver
         self.typ = typ
+
         self.size = size
+        if self.typ == "RTS":
+            self.size = RTS_FRAME_SIZE
+        elif self.typ == "CTS":
+            self.size = CTS_FRAME_SIZE
+        elif self.typ == "ACK":
+            self.size = ACK_FRAME_SIZE
+
         self.duration = duration
         self.propagation_speed = sender.medium.propagation_speed
         self.max_range = sender.detect_range

@@ -3,7 +3,6 @@ import sys
 from typing import Type, Dict
 from multiprocessing import Pool
 
-from tqdm import tqdm
 from dependency_injector.wiring import Provide, inject
 
 from core.implements import (
