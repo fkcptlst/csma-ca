@@ -1,5 +1,6 @@
 from typing import Type, Dict
 
+from tqdm import tqdm
 from dependency_injector.wiring import Provide, inject
 
 from core.implements import (
@@ -15,12 +16,12 @@ from core.implements import (
 )
 from core.time.line import TimeLine
 from core.container import DIContainer
-from config import default_settings
-from utils.log import logger_factory, station_notate, frame_notate
+from config import default_settings, various_settings
+from utils.log import log_result, logger_factory, station_notate, frame_notate
 
 
 @inject
-def main(
+def simulate(
     settings: Dict = Provide[DIContainer.config.settings],
     timeline: TimeLine = Provide[DIContainer.timeline],
     medium: Type[Medium] = Provide[DIContainer.medium],
@@ -38,16 +39,18 @@ def main(
         slot_time=settings["slot_time"],
         with_rts=settings["with_rts"],
     )
-    timeline.set_after_tick(logger_factory(medium, settings["frame_size"]))
+    if settings["log"]:
+        timeline.set_after_tick(logger_factory(medium, settings["frame_size"]))
     timeline.run()
+    return timeline
 
 
-if __name__ == "__main__":
+def wire(settings: Dict = default_settings):
     di_container = DIContainer()
     di_container.config.from_dict(
         {
             "settings": {
-                **default_settings,
+                **settings,
             },
             "notation": [
                 {"instance": Station, "notation": station_notate},
@@ -66,4 +69,14 @@ if __name__ == "__main__":
         }
     )
     di_container.wire(modules=[__name__])
+
+
+def main():
+    for settings in tqdm(various_settings):
+        wire(settings)
+        timeline = simulate()
+        log_result(timeline, settings)
+
+
+if __name__ == "__main__":
     main()

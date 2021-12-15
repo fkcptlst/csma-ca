@@ -11,7 +11,7 @@ default_settings = {
     "area_size": 50,
     "station_count": 5,
     "data_rate": 11 * MEGA,
-    "frame_rate": 1000,
+    "frame_rate": 500,
     "detect_range": 25,
     "frame_size": 8 * 1500,
     "backoff_min": 2,
@@ -19,8 +19,9 @@ default_settings = {
     "interval": 0.0,
     "slot_time": 20,
     "step": 10,
-    "max_time": ONE_SECOND // 10,
+    "max_time": ONE_SECOND // 1000,
     "area_size": 50,
+    "log": True,
     "log_screen": True,
     "sifs": 10,
 }
@@ -52,7 +53,7 @@ frame_rate = [
 ]
 
 various_settings = [
-    {**default_settings, **s, **b, **f}
+    {**default_settings, **s, **b, **f, "log": False, "log_screen": False}
     for s in station_count
     for b in backoff_min
     for f in frame_rate
