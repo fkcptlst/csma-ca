@@ -8,11 +8,11 @@ default_settings = {
     "star_topology": True,
     "with_rts": True,
     "propagation_speed": SPEED_OF_LIGHT / 3,
-    "area_size": 50,
+    "area_size": 80,
     "station_count": 5,
     "data_rate": 11 * MEGA,
     "frame_rate": 500,
-    "detect_range": 25,
+    "detect_range": 40,
     "frame_size": 8 * 1500,
     "backoff_min": 2,
     "backoff_max": 1024,
@@ -58,10 +58,11 @@ various_settings = [
         **s,
         **b,
         **f,
-        "log": False,
-        "log_screen": False,
+        "step": 20,
         "interval": 0.0,
         "max_time": ONE_SECOND // 10,
+        "log": False,
+        "log_screen": False,
     }
     for s in station_count
     for f in frame_rate
