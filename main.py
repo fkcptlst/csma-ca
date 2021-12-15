@@ -3,6 +3,7 @@ import sys
 from typing import Type, Dict
 from multiprocessing import Pool
 
+from tqdm import tqdm
 from dependency_injector.wiring import Provide, inject
 
 from core.implements import (
@@ -88,14 +89,14 @@ def simulate_and_save_result(settings: Dict = default_settings):
 if __name__ == "__main__":
     debug = False
     overwrite = False
+    multiprocess = False
 
-    try:
-        if sys.argv[1] == "--debug":
-            debug = True
-        if sys.argv[1] == "--overwrite":
-            overwrite = True
-    except IndexError:
-        pass
+    if "--debug" in sys.argv:
+        debug = True
+    if "--overwrite" in sys.argv:
+        overwrite = True
+    if "--multiprocess" in sys.argv:
+        overwrite = True
 
     if debug:
         wire(default_settings)
@@ -112,5 +113,9 @@ if __name__ == "__main__":
         ]
     )
 
-    pool = Pool(processes=16)
-    pool.map(simulate_and_save_result, settings)
+    if multiprocess:
+        pool = Pool(processes=16)
+        pool.map(simulate_and_save_result, settings)
+    else:
+        for s in tqdm(settings):
+            simulate_and_save_result(s)
