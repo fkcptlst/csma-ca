@@ -41,7 +41,7 @@ def simulate(
         with_rts=settings["with_rts"],
     )
     if settings["log"]:
-        timeline.set_after_tick(logger_factory(medium, settings["frame_size"]))
+        timeline.set_after_tick(logger_factory(settings))
     timeline.run()
     return timeline
 
@@ -80,8 +80,11 @@ def main():
 
 
 if __name__ == "__main__":
-    if sys.argv[1] == "--debug":
-        wire(default_settings)
-        timeline = simulate()
-    else:
-        main()
+    try:
+        if sys.argv[1] == "--debug":
+            wire(default_settings)
+            timeline = simulate()
+        exit()
+    except IndexError:
+        pass
+    main()

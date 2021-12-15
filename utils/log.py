@@ -1,7 +1,7 @@
-import json
+import pandas as pd
 from typing import Dict
 from constant import KILLO, MILLI_SECOND, ONE_SECOND
-from core.implements import Station, Medium, Frame
+from core.implements import Station, Medium, Frame, medium
 from core.time.line import TimeLine
 from utils.helper import get_progress_bar
 
@@ -23,7 +23,12 @@ def frame_notate(frame: Frame):
         return frame.icon()
 
 
-def get_log(timeline: TimeLine, medium: Medium, frame_size: int, verbose: bool):
+def parse_result(timeline: TimeLine, settings: Dict):
+    mediums = [p for p in timeline.participants if isinstance(p, Medium)]
+    if len(mediums) != 1:
+        raise ValueError("Only one medium is supported")
+    frame_size = settings["frame_size"]
+    medium = mediums[0]
     processed = 0
     collisions = 0
     sent = 0
@@ -57,6 +62,36 @@ def get_log(timeline: TimeLine, medium: Medium, frame_size: int, verbose: bool):
     max_bps = 8 * processed_ideal * ONE_SECOND / (timeline.current * bps_unit)
     collision_rate = collisions / (sent if sent != 0 else 1)
 
+    return (
+        {
+            "bps": bps,
+            "max_bps": max_bps,
+            "collision_rate": collision_rate,
+            "wasted": wasted,
+            "frame_on_air": medium.frame_count(),
+            "collisions": collisions,
+            "sent": sent,
+            "processed": processed,
+            "processed_ideal": processed_ideal,
+            "data_rate": data_rate,
+            "frame_rate": frame_rate,
+            "station_count": settings["station_count"],
+            "backoff_min": settings["backoff_min"],
+        },
+        medium,
+    )
+
+
+def get_log(timeline: TimeLine, settings: Dict, verbose: bool):
+    result, medium = parse_result(timeline, settings)
+    bps = result["bps"]
+    max_bps = result["max_bps"]
+    collision_rate = result["collision_rate"]
+    wasted = result["wasted"]
+    frame_on_air = result["frame_on_air"]
+    collisions = result["collisions"]
+    sent = result["sent"]
+
     msg = f"{'[time]':20}{timeline.current/MILLI_SECOND:.2f}ms\n"
     msg += "\n"
     msg += f"{'[wasted]':20}{wasted/MILLI_SECOND:.2f}ms\n"
@@ -65,7 +100,7 @@ def get_log(timeline: TimeLine, medium: Medium, frame_size: int, verbose: bool):
     msg += "\n"
     msg += f"{'[collision rate]':20}{get_progress_bar(collision_rate)} {collisions}/{sent}\n"
     if verbose:
-        msg += f"{'[frames on air]':20} {medium.frame_count()}\n"
+        msg += f"{'[frames on air]':20} {frame_on_air}\n"
 
     msg += "\n"
     msg += f"[node details]\n"
@@ -148,9 +183,9 @@ def get_log(timeline: TimeLine, medium: Medium, frame_size: int, verbose: bool):
     return msg
 
 
-def logger_factory(medium: Medium, frame_size: int):
+def logger_factory(settings: Dict):
     def logger(timeline: TimeLine):
-        print(get_log(timeline, medium, frame_size, True))
+        print(get_log(timeline, settings, True))
 
     return logger
 
@@ -170,6 +205,11 @@ def log_result(timeline: TimeLine, settings: Dict):
     medium = mediums[0]
     frame_size = settings["frame_size"]
 
-    msg = get_log(timeline, medium, frame_size, False)
-    with open(f"results/{summary_settings(settings)}.txt", "w") as f:
+    result, _ = parse_result(timeline, settings)
+    msg = get_log(timeline, settings, False)
+
+    summary = summary_settings(settings)
+    with open(f"results/log/{summary}.txt", "w") as f:
         f.write(msg)
+
+    pd.DataFrame.from_dict([result]).to_csv(f"results/csv/{summary}.csv")
