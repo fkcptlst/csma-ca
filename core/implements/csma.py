@@ -81,6 +81,9 @@ class CSMA(AbstractCSMA):
 
         if self.difs.is_left():
             self.difs.decrease(step)
+            # difs just ended, set random backoff
+            if not self.difs.is_left():
+                self.set_backoff()
             return False
 
         # wait for backoff
