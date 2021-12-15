@@ -96,7 +96,7 @@ if __name__ == "__main__":
     if "--overwrite" in sys.argv:
         overwrite = True
     if "--multiprocess" in sys.argv:
-        overwrite = True
+        multiprocess = True
 
     if debug:
         wire(default_settings)
