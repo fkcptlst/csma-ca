@@ -110,6 +110,8 @@ class Frame(AbstractFrame, DrawRadiusMixin, TimeParticipant):
 
     def get_location(self, moved: float) -> Tuple[float, float]:
         distance = self.distance
+        if distance == 0:
+            return self.sender.location
         return (
             (
                 self.sender.location[0]
