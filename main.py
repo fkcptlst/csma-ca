@@ -1,5 +1,6 @@
 import sys
 from typing import Type, Dict
+from multiprocessing import Pool
 
 from tqdm import tqdm
 from dependency_injector.wiring import Provide, inject
@@ -72,11 +73,10 @@ def wire(settings: Dict = default_settings):
     di_container.wire(modules=[__name__])
 
 
-def main():
-    for settings in tqdm(various_settings):
-        wire(settings)
-        timeline = simulate()
-        log_result(timeline, settings)
+def simulate_and_save_result(settings: Dict = default_settings):
+    wire(settings)
+    timeline = simulate()
+    log_result(timeline, settings)
 
 
 if __name__ == "__main__":
@@ -87,4 +87,6 @@ if __name__ == "__main__":
         exit()
     except IndexError:
         pass
-    main()
+
+    pool = Pool(processes=16)
+    pool.map(simulate_and_save_result, various_settings)
