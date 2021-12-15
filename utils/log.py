@@ -194,17 +194,11 @@ def summary_settings(settings: Dict):
 
 
 def log_result(timeline: TimeLine, settings: Dict):
-    mediums = [p for p in timeline.participants if isinstance(p, Medium)]
-    if len(mediums) != 1:
-        raise ValueError("Only one medium is supported")
-    medium = mediums[0]
-    frame_size = settings["frame_size"]
-
     result, _ = parse_result(timeline, settings)
-    msg = get_log(timeline, settings, False)
-
     summary = summary_settings(settings)
-    with open(f"results/log/{summary}.txt", "w") as f:
-        f.write(msg)
+
+    # msg = get_log(timeline, settings, False)
+    # with open(f"results/log/{summary}.txt", "w") as f:
+    #     f.write(msg)
 
     pd.DataFrame.from_dict([result]).to_csv(f"results/csv/{summary}.csv")
