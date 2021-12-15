@@ -1,25 +1,66 @@
 import random
-from typing import List, TYPE_CHECKING
+from typing import List, Type
+
+from dependency_injector.wiring import Provide
 from core.abc.medium import AbstractMedium
 from core.abc.station import AbstractStation
 from core.abc.frame import AbstractFrame
+from core.container import DIContainer
 
 from core.timeline import TimeParticipant
-from utils.helper import get_distance, is_location_equal
-from constant import (
-    PROPAGATION_SPEED,
-)
+from utils.helper import get_distance, get_random_location, is_location_equal
 
 
 class Medium(AbstractMedium, TimeParticipant):
     def __init__(
-        self, star_topology: bool = False, propagation_speed: float = PROPAGATION_SPEED
+        self,
+        star_topology: bool,
+        propagation_speed: float,
+        station_count: int,
+        area_size: int,
     ):
         self.propagation_speed = propagation_speed
         self.stations: List[AbstractStation] = []
         self.frames: List[AbstractFrame] = []
         self.star_topology = star_topology
+        self.area_size = area_size
+        self.station_count = station_count
         self.center = None
+        self.register()
+
+    def init_stations(
+        self,
+        data_rate: float,
+        frame_rate: float,
+        detect_range: float,
+        slot_time: int,
+        timeout: int,
+        with_rts: bool,
+        station_type: Type[AbstractStation] = Provide[DIContainer.station],
+    ):
+        for i in range(0, self.station_count):
+            center = self.star_topology and i == 0
+
+            location = get_random_location(self.area_size)
+            if self.star_topology and not center:
+                location = get_random_location(self.area_size, detect_range - 1)
+            elif self.star_topology and center:
+                location = (self.area_size // 2, self.area_size // 2)
+
+            station = station_type(
+                id=i,
+                location=location,
+                medium=self,
+                data_rate=data_rate,
+                frame_rate=frame_rate,
+                detect_range=detect_range,
+                slot_time=slot_time,
+                timeout=timeout,
+                with_rts=with_rts,
+            )
+
+            if center:
+                self.set_center(station)
 
     def set_center(self, station: AbstractStation):
         self.center = station

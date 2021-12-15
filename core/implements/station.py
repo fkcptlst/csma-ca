@@ -1,51 +1,54 @@
 import random
 from typing import Tuple, Type
 
-from core.abc.frame import AbstractFrame, AbstractFrameStorage
+from dependency_injector.wiring import Provide, inject
 
+from core.abc.frame import AbstractFrame, AbstractFrameStorage
 from core.abc.station import AbstractStation
 from core.abc.transmitter import AbstractTransmitter
 from core.abc.csma import AbstractCSMA
+from core.abc.medium import AbstractMedium
+from core.container import DIContainer
 from core.timeline import TimeParticipant
 from constant import (
     ONE_SECOND,
-    STATION_DATA_RATE,
-    STATION_DETECT_RANGE,
-    STATION_FRAME_RATE,
-    SLOT_TIME,
-    ACK_TIMEOUT,
 )
-
-from .medium import Medium
 
 
 class Station(AbstractStation, TimeParticipant):
     send_queue_size: int = 10
     recv_queue_size: int = 1
-    detect_range: float = STATION_DETECT_RANGE
-    slot_time: int = SLOT_TIME
     frame: Type[AbstractFrame]
-    data_rate: int = STATION_DATA_RATE
-    frame_rate: float = STATION_FRAME_RATE
     sent: int = 0
-    timeout: int = ACK_TIMEOUT
     with_rts: bool = True
 
+    @inject
     def __init__(
         self,
         id: int,
         location: Tuple[float, float],
+        medium: AbstractMedium,
+        data_rate: int,
+        frame_rate: int,
+        detect_range: float,
+        slot_time: int,
+        timeout: int,
         with_rts: bool,
-        medium: Medium,
-        transmitter: Type[AbstractTransmitter],
-        frame: Type[AbstractFrame],
-        frame_storage: Type[AbstractFrameStorage],
-        csma: Type[AbstractCSMA],
+        transmitter: Type[AbstractTransmitter] = Provide[DIContainer.transmitter],
+        frame: Type[AbstractFrame] = Provide[DIContainer.frame],
+        frame_storage: Type[AbstractFrameStorage] = Provide[DIContainer.frame_storage],
+        csma: Type[AbstractCSMA] = Provide[DIContainer.csma],
     ):
         self.id = id
         self.location = location
-        self.with_rts = with_rts
         self.medium = medium
+        self.with_rts = with_rts
+        self.data_rate = data_rate
+        self.frame_rate = frame_rate
+        self.detect_range = detect_range
+        self.slot_time = slot_time
+        self.timeout = timeout
+
         self.frame = frame
         self.transmitter = transmitter(
             station_id=self.id,
@@ -57,6 +60,7 @@ class Station(AbstractStation, TimeParticipant):
             frame_storage=frame_storage,
             csma=csma,
         )
+        self.register()
         self.medium.add_station(self)
 
     def want_to_push(self) -> bool:

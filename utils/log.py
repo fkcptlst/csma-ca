@@ -102,7 +102,7 @@ def logger_factory(medium: Medium, rts_cts: bool = True):
             detected = ""
             if station.transmitter.detected_frames.get():
                 if station.transmitter.detected_frames.count() > 1:
-                    detected += "* "
+                    detected += "*"
                 detected += str(station.transmitter.detected_frames.get())
             msg += f"{detected.rjust(12, ' ')} | "
 

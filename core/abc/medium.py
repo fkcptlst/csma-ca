@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, List, Optional, Type
 
 if TYPE_CHECKING:
     from core.abc.station import AbstractStation
@@ -12,6 +12,21 @@ class AbstractMedium(ABC):
     frames: List["AbstractFrame"]
     star_topology: bool
     center: Optional["AbstractStation"]
+    station_count: int
+    area_size: int
+
+    @abstractmethod
+    def init_stations(
+        self,
+        data_rate: float,
+        frame_rate: float,
+        detect_range: float,
+        slot_time: int,
+        timeout: int,
+        with_rts: bool,
+        station_type: Type["AbstractStation"],
+    ):
+        pass
 
     @abstractmethod
     def set_center(self, station: "AbstractStation"):

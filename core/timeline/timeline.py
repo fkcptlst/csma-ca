@@ -1,7 +1,9 @@
 import time
-from typing import Callable, Dict, List, Optional
-from dependency_injector import containers, providers
-from dependency_injector.wiring import Provide, inject
+from typing import Callable, Dict, List, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .participant import TimeParticipant
+
 from constant import AREA_SIZE, MAX_TIME, INTERVAL, STEP
 from utils.area import AreaDrawer
 
@@ -49,33 +51,3 @@ class TimeLine:
                 self.after_tick(self)
 
             time.sleep(self.interval)
-
-
-class TimeLineContainer(containers.DeclarativeContainer):
-    config = providers.Configuration()
-    timeline = providers.Singleton(
-        TimeLine,
-        notation=config.notation,
-        log_screen=config.log_screen,
-        step=config.step,
-    )
-
-
-class TimeParticipant:
-    @inject
-    def register(self, timeline: TimeLine = Provide[TimeLineContainer.timeline]):
-        self.timeline = timeline
-        timeline.add_participant(self)
-
-    def unregister(self):
-        self.timeline.participants.remove(self)
-
-    @property
-    def current(self) -> int:
-        return self.timeline.current
-
-    def on_tick_init(self, step: int):
-        pass
-
-    def on_tick(self, step: int):
-        pass

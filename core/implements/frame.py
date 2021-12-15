@@ -1,9 +1,8 @@
 import random
-from typing import List, Tuple, Union, Optional
+from typing import List, Tuple, Optional
 from core.abc.frame import AbstractFrame, AbstractFrameStorage, FrameType
 from core.abc.station import AbstractStation
-
-from core.timeline import TimeLine, TimeParticipant
+from core.timeline import TimeParticipant
 from utils.helper import get_circle, get_distance, get_line
 from constant import (
     FRAME_SIZE,
