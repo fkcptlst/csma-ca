@@ -116,9 +116,13 @@ if __name__ == "__main__":
 
     random.shuffle(settings)
 
-    if multiprocess:
-        pool = Pool(processes=16)
-        pool.map(simulate_and_save_result, settings)
-    else:
-        for s in tqdm(settings):
-            simulate_and_save_result(s)
+    i = 0
+    while True:
+        i += len(settings)
+        if multiprocess:
+            pool = Pool(processes=16)
+            pool.map(simulate_and_save_result, settings)
+        else:
+            for s in tqdm(settings):
+                simulate_and_save_result(s)
+        print(i)
