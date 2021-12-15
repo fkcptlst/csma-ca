@@ -6,4 +6,4 @@
 __pycache__
 
 results/log/*.txt
-results/csv/*.csv
+*.csv

@@ -2,9 +2,9 @@ import os
 import sys
 import random
 from typing import Type, Dict
-from multiprocessing import Pool
-
+from tqdm.contrib.concurrent import process_map
 from tqdm import tqdm
+
 from dependency_injector.wiring import Provide, inject
 
 from core.implements import (
@@ -120,8 +120,7 @@ if __name__ == "__main__":
     while True:
         i += len(settings)
         if multiprocess:
-            pool = Pool(processes=16)
-            pool.map(simulate_and_save_result, settings)
+            process_map(simulate_and_save_result, settings, max_workers=4)
         else:
             for s in tqdm(settings):
                 simulate_and_save_result(s)
