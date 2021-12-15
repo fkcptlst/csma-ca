@@ -88,7 +88,10 @@ class CSMA(AbstractCSMA):
 
         # wait for backoff
         if self.backoff.is_left():
-            if not is_busy:
+            if is_busy:
+                self.set_difs()
+                self.backoff.reset(0)
+            else:
                 self.backoff.decrease(step)
             return False
 
