@@ -23,8 +23,8 @@ class CSMA(AbstractCSMA):
         self.difs_amount = sifs_amount + 2 * slot_time
 
         self.frame_time = int(frame_size / (data_rate / ONE_SECOND)) + 2 * slot_time
-        self.rts_duration = 2 * sifs_amount + 2 * self.frame_time
-        self.cts_duration = 3 * sifs_amount + 3 * self.frame_time
+        self.rts_duration = 3 * sifs_amount + 3 * self.frame_time
+        self.cts_duration = 2 * sifs_amount + 2 * self.frame_time
         self.backoff_min = backoff_min
         self.backoff_max = backoff_max
         self.backoff_range = backoff_min
