@@ -72,6 +72,7 @@ class Transmitter(AbstractTransmitter):
 
     def on_timeout(self):
         self.collisions += 1
+        self.wasted += self.timeout
         self.csma.collision_occured()
 
     def on_detect(self, frame: AbstractFrame):
@@ -105,7 +106,7 @@ class Transmitter(AbstractTransmitter):
             self.on_receive_failure()
         elif self.talkover_detected():
             # talkover (collision) occurs
-            self.wasted += step
+            pass
         elif self.detected_frames.get().id != frame.id:
             # receiving frame ended, and detected frame is the one which made the collision
             self.on_receive_failure()
@@ -198,16 +199,16 @@ class Transmitter(AbstractTransmitter):
     def is_acked(self) -> bool:
         return self.last_sent is None
 
+    def timeout_occured(self, current: int):
+        if not self.is_acked():
+            if self.last_sent.sent + self.timeout < current:
+                self.last_sent = None
+                return True
+        return False
+
     def okay_to_send(self, step: int) -> bool:
-        is_busy = self.is_medium_busy()
-        csma_okay = self.csma.check_and_decrease(is_busy, step)
-        is_acked = self.is_acked()
-        return (not is_busy) and csma_okay and is_acked
-
-    def check_timeout(self, current: int):
-        if self.last_sent is None:
-            return
-
-        if self.last_sent.sent + self.timeout < current:
-            self.last_sent = None
-            self.on_timeout()
+        if self.is_acked():
+            is_busy = self.is_medium_busy()
+            csma_ok = self.csma.check_and_decrease(is_busy, step)
+            return (not is_busy) and csma_ok
+        return False

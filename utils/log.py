@@ -67,7 +67,7 @@ def logger_factory(medium: Medium, frame_size: int):
 
         msg += "\n"
         msg += f"[node details]\n"
-        msg += f"{'ID'.rjust(4)} | {'send'.rjust(8)} | {'recv'.rjust(8)} | {'c'.rjust(3)} | {'s'.rjust(3)} | {'r'.rjust(3)} | {'sending'.rjust(30)} | {'receiving'.rjust(30)} | {'detected'.rjust(12)} | {'backoff'.rjust(8)} | {'difs'.rjust(8)} | {'sifs'.rjust(8)} | {'timeout'.rjust(8)} | {'nav'.rjust(8)} | {'allocate'.rjust(8)} | "
+        msg += f"{'ID'.rjust(4)} | {'send'.rjust(8)} | {'recv'.rjust(8)} | {'c'.rjust(3)} | {'s'.rjust(3)} | {'r'.rjust(3)} | {'sending'.rjust(30)} | {'receiving'.rjust(30)} | {'detected'.rjust(12)} | {'bo max'.rjust(8)} | {'backoff'.rjust(8)} | {'difs'.rjust(8)} | {'sifs'.rjust(8)} | {'timeout'.rjust(8)} | {'nav'.rjust(8)} | {'allocate'.rjust(8)} | "
 
         msg += "\n"
         for station in medium.stations:
@@ -115,6 +115,7 @@ def logger_factory(medium: Medium, frame_size: int):
                 detected += str(station.transmitter.detected_frames.get())
             msg += f"{detected.rjust(12, ' ')} | "
 
+            msg += f"{(station.transmitter.csma.backoff_range-1):-8} | "
             msg += f"{station.transmitter.csma.backoff.value:-8} | "
             msg += f"{station.transmitter.csma.difs.value:-8} | "
             msg += f"{station.transmitter.csma.sifs.value:-8} | "

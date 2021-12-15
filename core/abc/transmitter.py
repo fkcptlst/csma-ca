@@ -122,9 +122,13 @@ class AbstractTransmitter(ABC):
 
     # access control
     @abstractmethod
-    def okay_to_send(self, step: int) -> bool:
+    def is_acked(self) -> bool:
         pass
 
     @abstractmethod
-    def check_timeout(self, current: int):
+    def timeout_occured(self, current: int) -> bool:
+        pass
+
+    @abstractmethod
+    def okay_to_send(self, step: int) -> bool:
         pass

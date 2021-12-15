@@ -80,7 +80,8 @@ class Station(AbstractStation, TimeParticipant):
         )
 
     def on_tick(self, step):
-        self.transmitter.check_timeout(self.timeline.current)
+        if self.transmitter.timeout_occured(self.timeline.current):
+            self.transmitter.on_timeout()
 
         self.transmitter.csma.nav_decrease(step)
 
