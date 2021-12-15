@@ -5,5 +5,5 @@
 .mypy_cache
 __pycache__
 
-results/log/*
-results/csv/*
+results/log/*.txt
+results/csv/*.csv
