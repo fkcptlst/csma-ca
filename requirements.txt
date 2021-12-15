@@ -7,7 +7,6 @@ mypy-extensions==0.4.3
 omegaconf==2.1.1
 pathspec==0.9.0
 platformdirs==2.4.0
-python-dotenv==0.19.2
 PyYAML==6.0
 six==1.16.0
 toml==0.10.2
