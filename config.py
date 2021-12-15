@@ -16,10 +16,10 @@ default_settings = {
     "frame_size": 8 * 1500,
     "backoff_min": 2,
     "backoff_max": 1024,
-    "interval": 0.0,
+    "interval": 0.05,
     "slot_time": 20,
     "step": 10,
-    "max_time": ONE_SECOND // 1000,
+    "max_time": ONE_SECOND,
     "area_size": 50,
     "log": True,
     "log_screen": True,
@@ -53,8 +53,17 @@ frame_rate = [
 ]
 
 various_settings = [
-    {**default_settings, **s, **b, **f, "log": False, "log_screen": False}
+    {
+        **default_settings,
+        **s,
+        **b,
+        **f,
+        "log": False,
+        "log_screen": False,
+        "interval": 0.0,
+        "max_time": ONE_SECOND // 10,
+    }
     for s in station_count
-    for b in backoff_min
     for f in frame_rate
+    for b in backoff_min
 ]

@@ -1,3 +1,4 @@
+import sys
 from typing import Type, Dict
 
 from tqdm import tqdm
@@ -79,4 +80,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if sys.argv[1] == "--debug":
+        wire(default_settings)
+        timeline = simulate()
+    else:
+        main()

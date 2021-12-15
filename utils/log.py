@@ -64,7 +64,8 @@ def get_log(timeline: TimeLine, medium: Medium, frame_size: int, verbose: bool):
     msg += f"{'[throughput rate]':20}{get_progress_bar(bps/max_bps)} {bps:.2f}/{max_bps:.2f} \n"
     msg += "\n"
     msg += f"{'[collision rate]':20}{get_progress_bar(collision_rate)} {collisions}/{sent}\n"
-    msg += f"{'[on air frames]':20} {medium.frame_count()}\n"
+    if verbose:
+        msg += f"{'[frames on air]':20} {medium.frame_count()}\n"
 
     msg += "\n"
     msg += f"[node details]\n"
