@@ -55,7 +55,7 @@ sim_settings = {
     **default_settings,
     "step": 20,
     "interval": 0.0,
-    "max_time": ONE_SECOND // 10,
+    "max_time": 50 * ONE_SECOND // 1000,
     "log": False,
     "log_screen": False,
 }

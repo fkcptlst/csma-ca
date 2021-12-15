@@ -1,5 +1,6 @@
 import os
 import sys
+import random
 from typing import Type, Dict
 from multiprocessing import Pool
 
@@ -88,13 +89,13 @@ def simulate_and_save_result(settings: Dict = default_settings):
 
 if __name__ == "__main__":
     debug = False
-    overwrite = False
+    pass_done = False
     multiprocess = False
 
     if "--debug" in sys.argv:
         debug = True
-    if "--overwrite" in sys.argv:
-        overwrite = True
+    if "--pass-done" in sys.argv:
+        pass_done = True
     if "--multiprocess" in sys.argv:
         multiprocess = True
 
@@ -105,13 +106,15 @@ if __name__ == "__main__":
 
     settings = (
         various_settings
-        if overwrite
+        if not pass_done
         else [
             settings
             for settings in various_settings
             if f"{summary_settings(settings)}.csv" not in os.listdir("results/csv")
         ]
     )
+
+    random.shuffle(settings)
 
     if multiprocess:
         pool = Pool(processes=16)

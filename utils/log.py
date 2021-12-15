@@ -27,7 +27,6 @@ def parse_result(timeline: TimeLine, settings: Dict):
     mediums = [p for p in timeline.participants if isinstance(p, Medium)]
     if len(mediums) != 1:
         raise ValueError("Only one medium is supported")
-    frame_size = settings["frame_size"]
     medium = mediums[0]
     processed = 0
     collisions = 0
@@ -59,6 +58,7 @@ def parse_result(timeline: TimeLine, settings: Dict):
 
     return (
         {
+            "current": timeline.current,
             "bps": bps,
             "max_bps": max_bps,
             "collision_rate": collision_rate,
@@ -201,4 +201,10 @@ def log_result(timeline: TimeLine, settings: Dict):
     # with open(f"results/log/{summary}.txt", "w") as f:
     #     f.write(msg)
 
-    pd.DataFrame.from_dict([result]).to_csv(f"results/csv/{summary}.csv")
+    df = pd.DataFrame.from_dict([result])
+    filename = f"results/csv/{summary}.csv"
+    try:
+        df = pd.concat([pd.read_csv(filename), df])
+    except FileNotFoundError:
+        pass
+    df.to_csv(f"results/csv/{summary}.csv", index=False)
