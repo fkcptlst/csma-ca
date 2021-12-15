@@ -1,3 +1,4 @@
+import os
 import sys
 from typing import Type, Dict
 from multiprocessing import Pool
@@ -19,7 +20,13 @@ from core.implements import (
 from core.time.line import TimeLine
 from core.container import DIContainer
 from config import default_settings, various_settings
-from utils.log import log_result, logger_factory, station_notate, frame_notate
+from utils.log import (
+    log_result,
+    logger_factory,
+    station_notate,
+    frame_notate,
+    summary_settings,
+)
 
 
 @inject
@@ -80,13 +87,31 @@ def simulate_and_save_result(settings: Dict = default_settings):
 
 
 if __name__ == "__main__":
+    debug = False
+    overwrite = False
+
     try:
         if sys.argv[1] == "--debug":
-            wire(default_settings)
-            timeline = simulate()
-        exit()
+            debug = True
+        if sys.argv[1] == "--overwrite":
+            overwrite = True
     except IndexError:
         pass
 
+    if debug:
+        wire(default_settings)
+        timeline = simulate()
+        exit()
+
+    settings = (
+        various_settings
+        if overwrite
+        else [
+            settings
+            for settings in various_settings
+            if f"{summary_settings(settings)}.csv" not in os.listdir("results/csv")
+        ]
+    )
+
     pool = Pool(processes=16)
-    pool.map(simulate_and_save_result, various_settings)
+    pool.map(simulate_and_save_result, settings)
