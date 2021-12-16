@@ -72,6 +72,8 @@ def parse_result(timeline: TimeLine, settings: Dict):
             "frame_rate": frame_rate,
             "station_count": settings["station_count"],
             "backoff_min": settings["backoff_min"],
+            "star_topology": settings["star_topology"],
+            "with_rts": settings["with_rts"],
         },
         medium,
     )
