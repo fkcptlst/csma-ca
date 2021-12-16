@@ -24,12 +24,26 @@ class AbstractStation(ABC):
 
     @abstractmethod
     def want_to_push(self) -> bool:
+        """Check if the station have any frame to send.
+
+        Sending frame storage of it's transmitter must be empty,
+        allocated counter must be expired.
+
+        Then calculate the probability of new frame with it's frame rate.
+        """
         pass
 
     @abstractmethod
-    def choose_receiver(self):
+    def choose_receiver(self) -> "AbstractStation":
+        """Choose the random receiver in the detect range of the station."""
         pass
 
     @abstractmethod
     def okay_to_send(self, step: int) -> bool:
+        """Check if the station can send a frame.
+
+        The result of ``transmitter.okay_to_send`` must be true,
+        sending frame storage of it's transmitter must be empty,
+        and the current time must be at the slot time.
+        """
         pass
