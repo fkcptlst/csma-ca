@@ -1,4 +1,3 @@
-import pandas as pd
 from typing import Dict
 from constant import KILLO, MILLI_SECOND, ONE_SECOND
 from core.implements import Station, Medium, Frame, medium
@@ -193,6 +192,8 @@ def summary_settings(settings: Dict):
 
 
 def log_result(timeline: TimeLine, settings: Dict):
+    import pandas as pd
+
     result, _ = parse_result(timeline, settings)
     summary = summary_settings(settings)
 

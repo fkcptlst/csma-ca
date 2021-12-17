@@ -1,13 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import List, Type, TypedDict, Union
+from typing import Dict, List, Type, Union
 
 from core.abc.csma import AbstractCSMA
 from core.abc.frame import AbstractFrame, AbstractFrameStorage, FrameType
 
 
-ProceedRecord = TypedDict(
-    "ProceedRecord", {"typ": FrameType, "size": int, "count": int}
-)
+ProceedRecord = Dict
 
 
 class AbstractTransmitter(ABC):

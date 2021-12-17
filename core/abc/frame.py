@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Union, Literal
+from typing import Optional
 from typing import TYPE_CHECKING, List, Tuple
 
 if TYPE_CHECKING:
     from .station import AbstractStation
 
 
-FrameType = Union[Literal["DATA"], Literal["ACK"], Literal["RTS"], Literal["CTS"]]
+FrameType = str
 
 
 class AbstractFrame(ABC):
