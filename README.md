@@ -53,7 +53,7 @@ default_settings = {
 }
 ```
 
-## Example
+# Example
 
 8 Stations with star topology
 
@@ -94,6 +94,32 @@ Backoff timer of Station 6 ended earlier than Station 3,
 so collision did not occured.
 
 <img src="assets/example_9.png" />
+
+## Hidden Terminal Topology
+
+Station 1 and 2 can not detect each other.
+
+<img src="assets/hidden_1.png" />
+
+Station 2 is sending DATA to station 0
+
+<img src="assets/hidden_3.png" />
+
+Station 1 starts to transmit, because it could not detect that the station 2 is transmitting.
+
+<img src="assets/hidden_4.png" />
+
+The collision occured, station 0 could not receive the both frame properly.
+
+<img src="assets/hidden_5.png" />
+
+Both station 1 and 2 have ended transmission, but station 0 did not received any frame, due to the collision. Therefore ACK does not transmitted.
+
+<img src="assets/hidden_7.png" />
+
+Timeout of station 2 has expired, it considers as collision occured and doubled it's backoff range.
+
+<img src="assets/hidden_8.png" />
 
 # State Diagram
 
@@ -203,9 +229,11 @@ default_settings = {
 
 # Experiments
 
-## Overview
+Star topology 구조에서 RTS/CTS가 적용된 상태로 180(5 \* 6 \* 6)가지의 config를 가지고 약 1500회 이상 시뮬레이션을 실행했다.
 
-Star topology 구조에서 RTS/CTS가 적용된 상태로 약 1500회 이상 시뮬레이션을 실행했다.
+<img src="assets/evaluation.png" />
+
+## Overview
 
 실험 대상 지표인 minimum backoff time, frame rate, station count 별로 throughput(bps)와 wasted time(단위 micro second)의 평균 값을 나타낸 표이다.
 
