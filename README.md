@@ -55,9 +55,49 @@ default_settings = {
 
 ## Example
 
-10 Stations with star topology
+8 Stations with star topology
 
-<img src="assets/example.png" />
+Station 7 wants to send RTS, waiting for DIFS timer.
+
+<img src="assets/example_1.png" />
+
+Station 7 is sending RTS to Station 0
+
+<img src="assets/example_2.png" />
+
+Station 0 is sending CTS to Station 7,
+Other stations which have received RTS have set their NAV timer.
+
+<img src="assets/example_3.png" />
+
+Station 7 is sending DATA to Station 0,
+Other stations which have received CTS have set their NAV timer.
+
+<img src="assets/example_4.png" />
+
+Station 0 is sending ACK to Station 7,
+station 7 is counting down it's timeout timer.
+If ACK does not received until the timeout expires,
+it would consider the collision occured and double the backoff range.
+
+<img src="assets/example_5.png" />
+
+Station 3 and 6 both want to send RTS, waiting for DIFS timer.
+
+<img src="assets/example_7.png" />
+
+Their DIFS have ended at same time, but they chose different backoff time randomly with the backoff range.
+
+<img src="assets/example_8.png" />
+
+Backoff timer of Station 6 ended earlier than Station 3,
+so collision did not occured.
+
+<img src="assets/example_9.png" />
+
+# State Diagram
+
+<img src="assets/state_diagram.jpg" />
 
 # Code
 
