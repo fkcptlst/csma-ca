@@ -60,8 +60,6 @@ class Frame(AbstractFrame, DrawRadiusMixin, TimeParticipant):
     sent = None
     sent_done = None
     vanished = None
-    collision = False
-    is_duplicate = False
 
     def __init__(
         self,
@@ -104,9 +102,6 @@ class Frame(AbstractFrame, DrawRadiusMixin, TimeParticipant):
         self.vanished = self.timeline.current
         self.delete_radius()
         self.unregister()
-
-    def collide(self):
-        self.collision = True
 
     def get_location(self, moved: float) -> Tuple[float, float]:
         distance = self.distance
@@ -171,23 +166,10 @@ class Frame(AbstractFrame, DrawRadiusMixin, TimeParticipant):
             duration=duration,
         )
 
-    def duplicate(self):
-        frame = self.assemble(
-            receiver=self.receiver,
-            sender=self.sender,
-            typ=self.typ,
-            duration=self.duration,
-        )
-        frame.id = self.id
-        frame.is_duplicate = True
-        return frame
-
     def __str__(self) -> str:
         return f"{self.typ} {self.sender.id} -> {self.receiver.id}"
 
     def icon(self) -> str:
-        if self.collision:
-            return "XX"
         return f"█{self.typ[0]}"
 
     def on_tick(self, step: int):

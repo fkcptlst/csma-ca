@@ -78,9 +78,7 @@ class Transmitter(AbstractTransmitter):
     def on_detect(self, frame: AbstractFrame):
         self.detected_frames.push(frame)
         if not self.talkover_detected():
-            if frame.is_duplicate:
-                return
-            elif frame.typ == "CTS":
+            if frame.typ == "CTS":
                 self.recv_frames.push(frame)
             elif frame.typ == "RTS":
                 self.recv_frames.push(frame)

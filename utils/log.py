@@ -17,10 +17,7 @@ def station_notate(station: Station):
 
 
 def frame_notate(frame: Frame):
-    if frame.collision:
-        return "XX"
-    else:
-        return frame.icon()
+    return frame.icon()
 
 
 def parse_result(timeline: TimeLine, settings: Dict):
