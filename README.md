@@ -61,79 +61,103 @@ default_settings = {
 
 # Code
 
+## Notice
+
+All description for the code is written as docstring of the abstact classes.
+Checkout the files at `core/abc`
+
+## Brief description
+
+- Abstracts
+  - `core/abc/`
+- Implements
+  - `core/implements/`
+- Timeline
+  - `core/time/`
+- Utils
+  - `utils/`
+- Configuration
+  - `config.py`
+
+### Abstracts and Implements
+
+Abstract와 Implement로 구성한 class 들은 simulation에 직접적으로 참여하는 객체이다.
+
+1. `Station`
+
+   프레임 전송을 시도하는 네트워크 참여자다.
+   frame_rate에 따라 전송 시도 확률이 결정되고
+   data_rate에 따라 transmission delay가 결정된다.
+   send, recv를 위한 queue가 있으며 transmission을 담당하는 `transmitter`를 attribute로 가진다.
+
+   - `Transmitter`
+
+     프레임의 전송과 송신을 담당한다.
+     채널 유휴 상태를 검사하고 프레임 수신 시 각 프레임의 종류(DATA, ACK, RTS, CTS)에 따라 정해진 함수를 부른다. throughput과 wasted 타임 등 지표를 계산하기 위해 전송이나 수신을 마친 경우 프레임 정보를 기록한다.
+     전송 가능 여부를 결정(access control)하는 것은 attribute로 가지는 `csma`가 담당한다.
+
+   - `CSMA`
+     backoff time, sifs, difs, nav와 같은 counter를 관리하고 전송 가능 여부를 결정한다.
+     CSMA/CA와 BEB algorithm이 구현되어 있다.
+
+2. `Frame`
+
+   채널에서 전송되는 프레임이다.
+   DATA, ACK, RTS, CTS 네 가지의 type(subtype)을 가질 수 있다.
+   sender, receiver 정보를 가지고 있고,
+   sender 쪽에서 아직 transmission 중인 경우 반경을 표시해서 채널의 station 들이 이 프레임을 감지할 수 있도록 한다.
+   자신의 반경 표시와 현재 위치 계산만을 하고, 실제로 충돌이 일어났는지 여부나 도착했는지 여부 등은 frame 객체 자체는 알지 못한다.
+
+3. `Medium`
+
+   채널의 역할을 한다. Station과 전송 중인 frame을 담고 있다.
+   매 tick마다 frame의 위치와 반경을 검사하고, 이를 수신해야하는 (반경에 들어오는) station이 있다면 이것을 station에 알려준다.
+   즉 station이 채널에 전송중인 frame을 감지할 수 있도록 한다.
+
+### Timeline
+
+시간을 기반으로 한 simulation을 위해 필요한 class가 여기에 구성되어 있다.
+
+1. `TimeLine`
+
+   반복문을 돌면서, 매 번 정해진 step 만큼 현재 시간을 증가시키고 등록된 참여자들의 `on_tick` 메소드를 실행시킨다. step과 interval을 조절해 simulation의 속도를 조절할 수 있다.
+   simulation 시각화를 위해 매 tick마다 현 상태를 2차원 평면으로 출력한다.
+
+2. `TimeParticipant`
+
+   `TimeLine`의 참여자로, 초기화될 때 singleton timeline에 추가된다.
+   `on_tick` method를 override하는 것으로 매 tick마다 어떤 행동을 하게 할 것인지 지정한다.
+
+### Utils
+
+기하학, 로그, 카운터 등을 위해 필요한 util function이 정의되어 있다.
+
+### Configuration
+
+`config.py`에서 simulation 설정을 변경할 수 있다.
+아래처럼 dictionary 형태로 configuration할 수 있으며 가능한 키값과 default는 아래와 같다.
+
 ```python
-class Transmitter:
-
-    def add_recv_record(self, frame: AbstractFrame):
-
-        pass
-
-    def add_sent_record(self, frame: AbstractFrame):
-        pass
-
-    # receiver methods
-    def on_receive_success(self):
-        pass
-
-    def on_receive_failure(self):
-        pass
-
-    def on_timeout(self):
-        pass
-
-    def on_detect(self, frame: AbstractFrame):
-        pass
-
-    def talkover_detected(self) -> bool:
-        pass
-
-    def is_medium_busy(self) -> bool:
-        pass
-
-    def is_receiving(self) -> bool:
-        pass
-
-    def proceed_recv(self, step: int):
-        pass
-
-    # sender methods
-    def push(self, frame: AbstractFrame):
-        pass
-
-    def want_to_send(self) -> bool:
-        pass
-
-    def is_sending(self) -> bool:
-        pass
-
-    def proceed_send(self, step: int):
-        pass
-
-    def send(self, step: int):
-        pass
-
-    # frame handlers
-    def on_data(self, frame: AbstractFrame):
-        pass
-
-    def on_ack(self, frame: AbstractFrame):
-        pass
-
-    def on_rts(self, frame: AbstractFrame):
-        pass
-
-    def on_cts(self, frame: AbstractFrame):
-        pass
-
-    # access control
-    def is_acked(self) -> bool:
-        pass
-
-    def timeout_occured(self, current: int) -> bool:
-        pass
-
-    def okay_to_send(self, step: int) -> bool:
-        pass
+default_settings = {
+    "star_topology": True,
+    "with_rts": True,
+    "propagation_speed": SPEED_OF_LIGHT / 3,
+    "area_size": 80,
+    "station_count": 10,
+    "data_rate": 11 * MEGA,
+    "frame_rate": 300,
+    "detect_range": 40,
+    "frame_size": 8 * 1500,
+    "backoff_min": 4,
+    "backoff_max": 1024,
+    "interval": 0.05,
+    "slot_time": 20,
+    "step": 10,
+    "max_time": ONE_SECOND,
+    "log": True,
+    "log_screen": True,
+    "sifs": 10,
+}
 
 ```
 
