@@ -30,43 +30,52 @@ class AbstractFrame(ABC):
     # department and arrival
     @abstractmethod
     def depart(self):
+        """ """
         pass
 
     @abstractmethod
     def done(self):
+        """ """
         pass
 
     @abstractmethod
     def vanish(self):
+        """ """
         pass
 
     @abstractmethod
     def collide(self):
+        """ """
         pass
 
     # locations
     @property
     @abstractmethod
     def moved(self) -> float:
+        """ """
         pass
 
     @property
     @abstractmethod
     def moved_tail(self) -> float:
+        """ """
         pass
 
     @property
     @abstractmethod
     def location(self) -> Tuple[float, float]:
+        """ """
         pass
 
     @property
     def location_tail(self) -> Tuple[float, float]:
+        """ """
         pass
 
     @property
     @abstractmethod
     def distance(self) -> float:
+        """ """
         pass
 
     # frame properties
@@ -78,18 +87,22 @@ class AbstractFrame(ABC):
         typ: FrameType = "DATA",
         duration: Union[int, None] = None,
     ) -> "AbstractFrame":
+        """ """
         pass
 
     @abstractmethod
     def duplicate(self) -> "AbstractFrame":
+        """ """
         pass
 
     @abstractmethod
     def is_equal(self, frame: "AbstractFrame") -> bool:
+        """ """
         pass
 
     @abstractmethod
     def icon(self) -> str:
+        """ """
         pass
 
 
@@ -99,32 +112,40 @@ class AbstractFrameStorage(ABC):
 
     @abstractmethod
     def is_empty(self) -> bool:
+        """ """
         pass
 
     @abstractmethod
     def is_full(self) -> bool:
+        """ """
         pass
 
     @abstractmethod
     def count(self) -> int:
+        """ """
         pass
 
     @abstractmethod
     def all(self) -> List[AbstractFrame]:
+        """ """
         pass
 
     @abstractmethod
     def clear(self) -> None:
+        """ """
         pass
 
     @abstractmethod
     def get(self) -> Union[AbstractFrame, None]:
+        """ """
         pass
 
     @abstractmethod
     def push(self, frame) -> None:
+        """ """
         pass
 
     @abstractmethod
     def pop(self) -> Union[AbstractFrame, None]:
+        """ """
         pass

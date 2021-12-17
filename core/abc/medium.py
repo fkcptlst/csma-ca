@@ -26,28 +26,35 @@ class AbstractMedium(ABC):
         with_rts: bool,
         station_type: Type["AbstractStation"],
     ):
+        """ """
         pass
 
     @abstractmethod
     def set_center(self, station: "AbstractStation"):
+        """ """
         pass
 
     @abstractmethod
     def add_station(self, station: "AbstractStation"):
+        """ """
         pass
 
     @abstractmethod
     def add_frame(self, frame: "AbstractFrame"):
+        """ """
         pass
 
     @abstractmethod
     def remove_frame(self, frame: "AbstractFrame"):
+        """ """
         pass
 
     @abstractmethod
     def frame_count(self) -> int:
+        """ """
         pass
 
     @abstractmethod
     def get_random_receiver(self, sender: "AbstractStation") -> "AbstractStation":
+        """ """
         pass

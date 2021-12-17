@@ -11,19 +11,19 @@ $ pip install -r requirements.txt
 ## Execution
 
 ```bash
-$ python3 main.py --debug # for mono simulation with graphical log
+$ python3 main.py  # for mono simulation with graphical log
 ```
 
 ```bash
-$ python3 main.py # for fast and many simulations with various settings
+$ python3 main.py --simulation # for simulations with various settings
 ```
 
 ```bash
-$ python3 main.py --multiprocess # for faster simulations with multiprocessing
+$ python3 main.py --simulation --multiprocess # for faster simulations with multiprocessing
 ```
 
 ```bash
-$ python3 main.py --pass-done # pass simulations with settings which already have done
+$ python3 main.py --simulation --pass-done # pass simulations with settings which already have done
 ```
 
 ## Configuration

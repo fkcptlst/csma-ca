@@ -88,18 +88,18 @@ def simulate_and_save_result(settings: Dict = default_settings):
 
 
 if __name__ == "__main__":
-    debug = False
+    simulation = False
     pass_done = False
     multiprocess = False
 
-    if "--debug" in sys.argv:
-        debug = True
+    if "--simulation" in sys.argv:
+        simulation = True
     if "--pass-done" in sys.argv:
         pass_done = True
     if "--multiprocess" in sys.argv:
         multiprocess = True
 
-    if debug:
+    if not simulation:
         wire(default_settings)
         timeline = simulate()
         exit()
